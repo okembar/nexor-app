@@ -1,0 +1,1930 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NetForge AI — Log Analyzer · Module 05 · NEXOR Advisory</title>
+<meta name="description" content="TAC virtuel multi-constructeurs — Cisco, Juniper, Aruba, Fortinet, Palo Alto, Huawei, Nokia, CheckPoint. Analyse IA de logs réseau.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* PALETTE NEXOR CANVAS */
+  --bg0: #060411; /* Void - Deep Space */
+  --bg1: #13092A; /* Dark */
+  --bg2: #0D0820; /* Deep */
+  --bg3: #1A0D3B; /* Lighter Deep */
+  --bg4: #2D1657; /* Highlight */
+  
+  --border: rgba(124, 58, 237, 0.25);
+  --border2: rgba(124, 58, 237, 0.15);
+  
+  --violet: #7C3AED;
+  --violet2: #5B21B6;
+  --flame: #F97316;
+  --cyan: #22D3EE;
+  --gold: #FCD34D;
+  --lavender: #A78BFA;
+  
+  --critical: #ef4444; --critical-bg: rgba(239,68,68,.1);
+  --error: #f97316; --error-bg: rgba(249,115,22,.1);
+  --warning: #eab308; --warning-bg: rgba(234,179,8,.1);
+  --info: #3b82f6; --info-bg: rgba(59,130,246,.1);
+  --success: #10B981; --success-bg: rgba(16,185,129,.1);
+  
+  --v-cisco: #00bceb; --v-juniper: #84bc22; --v-aruba: #ff7300;
+  --v-fortinet: #ee3124; --v-paloalto: #ffb900; --v-huawei: #cf0a2c;
+  --v-nokia: #005aff; --v-extreme: #6b2fa0; --v-generic: #6b7280;
+  
+  --font-ui: 'Montserrat', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --t-fast: 150ms ease; --t-norm: 250ms ease; --t-slow: 400ms ease;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-ui);background:var(--bg0);color:#e5e7eb;min-height:100vh;-webkit-font-smoothing:antialiased; overflow-x:hidden;}
+
+/* Scrollbar Premium */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--bg0);}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--violet);}
+
+input,textarea,button,select{font-family:inherit;}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--violet)!important;box-shadow:0 0 0 2px rgba(124,58,237,.2)!important;}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(124,58,237,.25)}50%{box-shadow:0 0 40px rgba(124,58,237,.5)}}
+@keyframes toastIn{from{transform:translateX(120%)}to{transform:translateX(0)}}
+
+/* App & Nav */
+#app{display:block}
+.nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(6, 4, 17, 0.85); backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border2);
+  padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;
+}
+.nav-brand-text { font-size:14px;font-weight:900;letter-spacing:4px;color:#fff;line-height:1; }
+.nav-brand-sub { font-size:6px;font-weight:300;letter-spacing:7px;color:var(--lavender);margin-top:2px; }
+.nav-badge { background:rgba(34,211,238,.1); color:var(--cyan); font-size:9px; font-weight:800; padding:4px 10px; border-radius:20px; border:1px solid rgba(34,211,238,.3); letter-spacing:1px; margin-left:12px; }
+
+/* Boutons */
+.btn{cursor:pointer;border:none;border-radius:8px;padding:8px 16px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;transition:all var(--t-fast);display:inline-flex;align-items:center;gap:6px;}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:#c4b5fd;}
+.btn-ghost:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(34,211,238,.05);}
+
+.btn-analyze{
+  width:100%;padding:16px;
+  background:linear-gradient(135deg, var(--violet2) 0%, var(--violet) 50%, var(--cyan) 100%);
+  color:#fff;border:none;border-radius:12px;
+  font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:all var(--t-norm);
+  box-shadow: 0 4px 20px rgba(124,58,237,.3);
+  position:relative; overflow:hidden;
+}
+.btn-analyze::after { content:''; position:absolute; inset:0; background:linear-gradient(rgba(255,255,255,.1),transparent); }
+.btn-analyze:hover:not(:disabled){ filter:brightness(1.15); transform:translateY(-2px); box-shadow: 0 8px 30px rgba(34,211,238,.4); }
+.btn-analyze:disabled{ opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
+
+/* Hero Section Premium */
+.hero-section {
+  position:relative; padding:60px 24px; text-align:center; border-bottom:1px solid var(--border2); margin-bottom: 32px;
+  background-image: url('https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=2000&q=80');
+  background-size: cover; background-position: center;
+}
+.hero-section::before { content: ''; position: absolute; inset: 0; background: rgba(6, 4, 17, 0.88); z-index: 1; }
+.hero-content { position: relative; z-index: 2; max-width: 900px; margin: 0 auto; }
+
+/* Cards Premium */
+.card-dark{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:16px;padding:24px;
+  box-shadow: 0 10px 40px rgba(0,0,0,.4);
+  margin-bottom:24px;
+}
+
+/* Vendor badges */
+.vbadge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.5px}
+.vbadge-cisco{background:rgba(0,188,235,.1);color:var(--v-cisco);border:1px solid rgba(0,188,235,.3)}
+.vbadge-juniper{background:rgba(132,188,34,.1);color:var(--v-juniper);border:1px solid rgba(132,188,34,.3)}
+.vbadge-aruba{background:rgba(255,115,0,.1);color:var(--v-aruba);border:1px solid rgba(255,115,0,.3)}
+.vbadge-fortinet{background:rgba(238,49,36,.1);color:var(--v-fortinet);border:1px solid rgba(238,49,36,.3)}
+.vbadge-paloalto{background:rgba(255,185,0,.1);color:var(--v-paloalto);border:1px solid rgba(255,185,0,.3)}
+.vbadge-huawei{background:rgba(207,10,44,.1);color:var(--v-huawei);border:1px solid rgba(207,10,44,.3)}
+.vbadge-nokia{background:rgba(0,90,255,.1);color:var(--v-nokia);border:1px solid rgba(0,90,255,.3)}
+.vbadge-generic{background:rgba(107,114,128,.1);color:#9ca3af;border:1px solid rgba(107,114,128,.3)}
+
+/* Severity counters */
+.sev-counter{text-align:center;border-radius:10px;padding:12px;min-width:70px; display:flex; flex-direction:column; justify-content:center;}
+.sev-critical{background:var(--critical-bg);border:1px solid rgba(239,68,68,.3)}
+.sev-error{background:var(--error-bg);border:1px solid rgba(249,115,22,.3)}
+.sev-warning{background:var(--warning-bg);border:1px solid rgba(234,179,8,.3)}
+.sev-info{background:var(--info-bg);border:1px solid rgba(59,130,246,.3)}
+
+/* Detection badge */
+.detect-badge{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--bg1);border:1px solid var(--border);border-radius:10px;font-size:11px;animation:fadeIn .3s ease}
+.detect-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* Toast notifications */
+#toastContainer{position:fixed;bottom:24px;right:24px;z-index:9000;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{pointer-events:auto;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 16px;font-size:11px;font-weight:600;color:#F8FAFC;display:flex;align-items:center;gap:10px;min-width:280px;max-width:380px;animation:toastIn .3s ease;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.toast-success{border-left:3px solid var(--success)}
+.toast-error{border-left:3px solid var(--critical)}
+.toast-info{border-left:3px solid var(--cyan)}
+
+/* Analysis mode selector */
+.mode-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}
+.mode-btn{background:var(--bg1);border:1px solid var(--border2);border-radius:10px;padding:10px;font-size:10px;font-weight:700;color:#9ca3af;cursor:pointer;text-align:left;transition:all var(--t-fast);display:flex;align-items:center;gap:8px}
+.mode-btn:hover{border-color:var(--violet);color:var(--lavender);background:rgba(124,58,237,.08)}
+.mode-btn.active{background:rgba(124,58,237,.15);border-color:var(--violet);color:var(--cyan); box-shadow: 0 4px 12px rgba(124,58,237,.2);}
+
+/* Equipment tabs */
+.eq-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.eq-tab{display:flex;align-items:center;gap:8px;background:var(--bg1);border:1px solid var(--border2);border-radius:10px;padding:8px 14px;font-size:11px;font-weight:600;color:#9ca3af;cursor:pointer;transition:all var(--t-fast);position:relative}
+.eq-tab:hover{background:rgba(124,58,237,.05); border-color:var(--border);}
+.eq-tab.active{background:var(--bg2);border-color:var(--cyan);color:var(--cyan); box-shadow: 0 4px 12px rgba(34,211,238,.15);}
+.eq-tab .eq-close{display:flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:transparent;border:none;color:#9ca3af;cursor:pointer;font-size:12px;padding:0;transition:all var(--t-fast)}
+.eq-tab .eq-close:hover{background:rgba(239,68,68,.2);color:var(--critical)}
+.eq-add{background:transparent;border:1px dashed var(--border);border-radius:10px;padding:8px 14px;font-size:11px;font-weight:700;color:#9ca3af;cursor:pointer;transition:all var(--t-fast)}
+.eq-add:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(34,211,238,.05)}
+.eq-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* Progress bar */
+.progress-wrap{background:var(--bg1);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px}
+.progress-step{display:flex;align-items:center;gap:12px;padding:8px 0;font-size:12px;color:#6b7280;transition:color var(--t-norm)}
+.progress-step.active{color:#F8FAFC}
+.progress-step.done{color:var(--success)}
+.progress-step-icon{width:22px;height:22px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;transition:all var(--t-norm)}
+.progress-step.done .progress-step-icon{background:var(--success);border-color:var(--success);color:#fff}
+.progress-step.active .progress-step-icon{border-color:var(--cyan);background:rgba(34,211,238,.2); color:var(--cyan);}
+.progress-bar-track{height:4px;background:var(--border2);border-radius:2px;margin-top:12px;overflow:hidden}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--violet),var(--cyan));border-radius:2px;transition:width .5s ease}
+
+/* Results panel */
+.rp-header{padding:24px;border-bottom:1px solid var(--border2);background:var(--bg2);border-radius:16px 16px 0 0}
+.rca-block{background:var(--bg1);border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden}
+.rca-header{display:flex;align-items:center;gap:12px;padding:16px;cursor:pointer;transition:background var(--t-fast)}
+.rca-header:hover{background:var(--bg3)}
+.rca-body{padding:16px;border-top:1px solid var(--border2);display:none}
+.rca-body.open{display:block;animation:fadeIn .2s ease}
+.code-block{background:var(--bg0);border:1px solid rgba(16,185,129,.2);border-left:4px solid var(--success);border-radius:10px;margin-top:12px;overflow:hidden}
+.code-block-header{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;border-bottom:1px solid rgba(16,185,129,.15);font-size:9px;letter-spacing:2px;color:var(--success);font-weight:800}
+.code-block pre{padding:16px;font-family:var(--font-mono);font-size:12px;color:#86efac;line-height:1.7;white-space:pre-wrap;word-break:break-all;margin:0}
+
+/* Event table */
+.evt-table{width:100%;border-collapse:collapse;font-size:11px}
+.evt-table th{padding:10px 12px;text-align:left;font-size:9px;font-weight:800;letter-spacing:1.5px;color:#9ca3af;border-bottom:1px solid var(--border);text-transform:uppercase;background:var(--bg1)}
+.evt-table td{padding:10px 12px;border-bottom:1px solid var(--border2);color:#c4b5fd;vertical-align:top;line-height:1.6}
+.evt-table tr:hover td{background:rgba(124,58,237,.05)}
+.evt-table .lvl-crit{color:var(--critical);font-weight:800}
+.evt-table .lvl-err{color:var(--flame);font-weight:700}
+.evt-table .lvl-warn{color:var(--gold);font-weight:600}
+.evt-table .lvl-info{color:var(--cyan)}
+
+/* RCA text */
+.rca-text{font-size:13px;color:#F8FAFC;line-height:1.8;margin:0}
+
+/* Accordion cmd copy button */
+.cp-btn{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:6px;padding:4px 10px;font-size:9px;font-weight:700;color:var(--success);cursor:pointer;transition:all var(--t-fast);flex-shrink:0}
+.cp-btn:hover{background:rgba(16,185,129,.2);}
+
+/* History */
+.hist-item{background:var(--bg1);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all var(--t-fast)}
+.hist-item:hover{border-color:var(--cyan);background:var(--bg3);box-shadow: 0 4px 12px rgba(34,211,238,.1)}
+
+/* vbtn (vendor selector) */
+.vbtn{cursor:pointer;transition:all var(--t-fast);background:var(--bg1);border:1px solid var(--border2);border-radius:8px;padding:8px 14px;font-size:11px;color:#9ca3af;font-weight:600}
+.vbtn:hover{border-color:var(--violet); color:var(--lavender);}
+.vbtn.on{background:var(--bg3);border-color:var(--violet);color:var(--cyan); box-shadow: 0 0 10px rgba(124,58,237,.2);}
+.sbtn{cursor:pointer;font-family:inherit;transition:all var(--t-fast)}
+.sbtn:hover{border-color:var(--violet)!important;color:var(--lavender)!important}
+
+/* Inputs Premium */
+.premium-input { background:var(--bg1);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--cyan);font-family:var(--font-mono); transition:all .2s; }
+.premium-input:focus { border-color:var(--cyan)!important; box-shadow: 0 0 0 2px rgba(34,211,238,.15)!important; }
+select option { background: var(--bg1); color: var(--text-1); }
+
+/* Scroll top */
+.scroll-top{position:fixed;bottom:32px;right:32px;z-index:999;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg, var(--violet), var(--cyan));color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transform:translateY(20px);transition:opacity .3s,transform .3s;box-shadow:0 6px 20px rgba(34,211,238,.4)}
+.scroll-top.visible{opacity:1;transform:translateY(0)}
+.scroll-top:hover{filter:brightness(1.1); transform:translateY(-2px) !important;}
+
+/* Print overrides (kept functional but matching new structure implicitly) */
+@media print {
+  @page { size: A4; margin: 18mm 15mm; }
+  #lock, nav, .no-print, .scroll-top, #toastContainer, #expertSettings, #preAnalysis, .eq-tabs, #eqPanels, #historySection, #tokenEstimate, #err, .btn-analyze, .card-dark > *:not(#rp), button:not(.rca-header), .btn, .eq-add, .eq-tab, [onclick*="toggleFullscreen"], [onclick*="exportReport"], [onclick*="window.print"], .cp-btn, #histBtn, .progress-wrap, .mode-grid, [style*="text-align:center"]:has(.btn-analyze), .hero-section { display: none !important; }
+  *, *::before, *::after { box-shadow: none !important; animation: none !important; }
+  html, body { background: #fff !important; color: #1a1a2e !important; font-family: 'Montserrat', sans-serif !important; font-size: 11pt !important; }
+  #rp::before { content: ''; display: block; height: 5px; background: linear-gradient(90deg, #5B21B6, #7C3AED, #F97316, #22D3EE, #FCD34D); margin-bottom: 28px; border-radius: 2px; }
+  body::after { content: 'NEXOR Advisory — CONFIDENTIEL'; position: fixed; bottom: 14mm; left: 0; right: 0; text-align: center; font-size: 7pt; letter-spacing: 3px; color: rgba(124,58,237,0.18); font-weight: 900; text-transform: uppercase; pointer-events: none; }
+  #rp { display: block !important; }
+  .card-dark { background: #fff !important; border: 1.5px solid #e5e7eb !important; border-radius: 12px !important; page-break-inside: avoid; }
+  .rp-header { background: #f8f7ff !important; border-bottom: 1px solid #ede9fe !important; padding: 24px 28px !important; border-radius: 12px 12px 0 0 !important; }
+  .rp-header p { color: #374151 !important; }
+  .sev-counter { background: #fff !important; }
+  .rca-body { display: block !important; }
+  .rca-block { background: #fff7ed !important; border: 1px solid #fed7aa !important; border-radius: 10px !important; page-break-inside: avoid; }
+  .rca-header { background: transparent !important; color: #ea580c !important; }
+  .rca-text { color: #431407 !important; }
+  .evt-table th { background: #f9fafb !important; color: #6b7280 !important; }
+  .evt-table td { border-bottom: 1px solid #f3f4f6 !important; color: #1f2937 !important; }
+  .evt-table .lvl-crit { color: #dc2626 !important; }
+  .timeline-wrap { background: #f8f7ff !important; border: 1px solid #ede9fe !important; }
+  .code-block { background: #1e1b4b !important; border-radius: 8px !important; page-break-inside: avoid; }
+  .code-block pre { color: #c4b5fd !important; }
+}
+
+
+.expert-section { display: none; }
+.expert-section.open { display: grid; animation: fadeIn .3s ease; }
+</style>
+</head>
+<body>
+
+<div id="toastContainer"></div>
+
+<div id="app">
+
+<nav class="nav">
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="index.html" style="display:flex;align-items:center;gap:12px;text-decoration:none">
+      <svg viewBox="0 0 80 100" width="20" height="24"><defs><linearGradient id="g2" x1="0" y1="0" x2="80" y2="100" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#5B21B6"/><stop offset="38%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#F97316"/></linearGradient></defs><path d="M0,0 L0,100 L14,100 L14,22 L66,100 L80,100 L80,0 L66,0 L66,78 L14,0 Z" fill="url(#g2)"/><polygon points="40,44 47,51 40,58 33,51" fill="#FCD34D"/></svg>
+      <div>
+        <div class="nav-brand-text">NEXOR <span style="font-weight:300; color:var(--text-5)">ADVISORY</span></div>
+        <div class="nav-brand-sub">MODULE 05 · LOG ANALYZER</div>
+      </div>
+    </a>
+    <span class="nav-badge">ENTERPRISE</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div style="display:flex;align-items:center;gap:6px"><div style="width:6px;height:6px;border-radius:50%;background:var(--success);animation:pulse 2s infinite"></div><span style="font-size:9px;color:var(--success);letter-spacing:2px;font-weight:700">LIVE</span></div>
+    <button onclick="toggleHistory()" class="btn btn-ghost no-print" id="histBtn">📋 Historique</button>
+  </div>
+</nav>
+
+<main style="max-width:1200px;margin:0 auto;padding:0 24px 80px">
+
+  <div class="hero-section">
+    <div class="hero-content">
+      <div style="font-size:10px;font-weight:800;letter-spacing:4px;color:var(--cyan);text-transform:uppercase;margin-bottom:16px">Analyse IA de logs réseau · 20+ constructeurs</div>
+      <h1 style="font-size:clamp(32px, 4vw, 48px);font-weight:900;line-height:1.15;margin-bottom:20px;color:#fff;letter-spacing:-1px">Diagnostiquez vos logs <br><span style="background:linear-gradient(135deg, var(--cyan) 0%, var(--violet) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent">en quelques secondes</span></h1>
+      <p style="font-size:14px;font-weight:500;color:var(--text-2);line-height:1.8;max-width:800px;margin:0 auto">Cisco · Juniper · Aruba · Fortinet · Palo Alto · Huawei · Nokia · CheckPoint · Extreme · Linux · Windows</p>
+    </div>
+  </div>
+
+  <div class="card-dark" style="margin-bottom:24px">
+    <div style="display:flex;gap:10px;margin-bottom:16px;align-items:center; flex-wrap:wrap;">
+      <button id="pb-claude" onclick="setProvider('claude')" class="vbtn on">☁️ Claude API</button>
+      <button id="pb-gemini" onclick="setProvider('gemini')" class="vbtn">🚀 Gemini Flash</button>
+      <button id="pb-lm" onclick="setProviderLM()" class="vbtn">🖥️ LM Studio</button>
+    </div>
+    
+    <div id="cfg-claude" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:20px">
+      <div style="flex-shrink:0">
+        <div style="font-size:9px;font-weight:800;letter-spacing:2px;color:var(--gold);margin-bottom:4px">MOTEUR CLOUD SÉCURISÉ</div>
+        <div style="font-size:10px;color:var(--cyan);font-family:var(--font-mono);font-weight:600">Proxy Netlify Serverless</div>
+      </div>
+      <div id="rgpd-banner" style="background:var(--bg1);border:1px solid var(--border);border-left:3px solid var(--success);border-radius:10px;padding:12px 16px;font-size:11px;color:var(--text-2);flex:1;min-width:250px;display:flex;align-items:center;gap:12px">
+        <span style="font-size:16px">🛡️</span>
+        <div style="line-height:1.5">
+          <strong style="color:var(--success)">Confidentialité garantie :</strong> Vos logs transitent via un proxy sécurisé. Aucune donnée n'est stockée sur nos serveurs.
+        </div>
+        <button onclick="document.getElementById('rgpd-banner').style.display='none'" style="margin-left:auto;background:transparent;border:none;color:var(--text-5);cursor:pointer;font-size:16px" title="Masquer">✕</button>
+      </div>
+    </div>
+    
+    <div id="cfg-lm" style="display:none;margin-bottom:20px">
+      <div style="font-size:10px; color:var(--text-4); margin-bottom:12px; line-height:1.4; background:var(--bg3); padding:10px; border-radius:8px; border:1px solid var(--border);">
+        ℹ️ <strong>Note :</strong> LM Studio s'exécute localement. Pour des raisons de sécurité du navigateur, cet outil doit être téléchargé et ouvert depuis votre machine pour pouvoir communiquer avec <code>localhost</code>.<br>
+        <div style="display:flex; gap:8px; margin-top:8px;">
+          <a href="netforge-log-analyzer.html" download class="btn" style="padding:6px 12px; font-size:10px; background:transparent; border:1px solid var(--cyan); color:var(--cyan);">⬇️ Télécharger l'outil</a>
+          <a href="https://lmstudio.ai/" target="_blank" class="btn" style="padding:6px 12px; font-size:10px; background:transparent; border:1px solid var(--violet); color:var(--violet);">🌐 Obtenir LM Studio</a>
+        </div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap; background:var(--bg1); padding:16px; border-radius:12px; border:1px solid var(--border);">
+        <div style="flex:1;min-width:220px">
+          <div style="font-size:9px;font-weight:800;letter-spacing:2px;color:var(--cyan);margin-bottom:6px">URL SERVEUR LM STUDIO</div>
+          <input type="text" id="lmurl" value="http://localhost:1234" class="premium-input" style="width:100%">
+        </div>
+        <div style="flex:1;min-width:180px">
+          <div style="font-size:9px;font-weight:800;letter-spacing:2px;color:var(--cyan);margin-bottom:6px">MODÈLE CIBLE</div>
+          <input type="text" id="lmmodel" placeholder="Ex: llama-3-8b-instruct" class="premium-input" style="width:100%">
+        </div>
+        <div style="flex:1;min-width:200px">
+          <div style="font-size:9px;font-weight:800;letter-spacing:2px;color:var(--cyan);margin-bottom:6px">CONTEXTE (LIGNES MAX)</div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <input type="range" id="lmlimit" min="20" max="400" value="80" step="10" style="flex:1;accent-color:var(--cyan)" oninput="document.getElementById('lmlimit_num').value=this.value; AppState.lmLimit=parseInt(this.value)">
+            <input type="number" id="lmlimit_num" value="80" min="20" max="400" step="10" class="premium-input" style="width:70px;padding:6px;text-align:center" oninput="document.getElementById('lmlimit').value=this.value; AppState.lmLimit=parseInt(this.value)">
+          </div>
+        </div>
+        <button class="btn btn-ghost" onclick="testLMStudio()" style="align-self:flex-end; padding:10px 16px; color:var(--cyan); border-color:var(--cyan);">TESTER LA CONNEXION</button>
+      </div>
+      <div id="lmstatus" style="font-size:11px;font-weight:600;margin-top:8px;color:var(--text-5);padding-left:4px"></div>
+    </div>
+
+    <div>
+      <div style="font-size:9px;font-weight:800;letter-spacing:2px;color:var(--lavender);text-transform:uppercase;margin-bottom:10px">Orientation du Diagnostic</div>
+      <div class="mode-grid" id="modeGrid"></div>
+    </div>
+  </div>
+
+  <div class="card-dark" style="margin-bottom:24px">
+
+    <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap;">
+      <div>
+        <div style="font-size:9px;font-weight:800;letter-spacing:2px;color:var(--lavender);text-transform:uppercase;margin-bottom:12px">Sources de Logs (Multi-Équipements)</div>
+        <div class="eq-tabs" id="eqTabs">
+          <button class="eq-add" onclick="addEquipment()">+ Nouvel Équipement</button>
+        </div>
+      </div>
+      <div style="min-width:250px;">
+        <div style="font-size:9px;font-weight:800;letter-spacing:2px;color:var(--teal-hl);text-transform:uppercase;margin-bottom:6px">🚀 Démonstration (Scénarios)</div>
+        <select class="form-select" style="background:var(--bg1); border-color:var(--teal-hl); color:var(--teal-hl); padding:8px 12px; font-size:11px; cursor:pointer;" onchange="if(this.value) { loadSampleLogs(this.value, this.options[this.selectedIndex].text); this.value=''; }">
+          <option value="" disabled selected style="background:var(--bg0);color:var(--text-4)">📋 Choisir des logs de test...</option>
+          <option value="l2" style="background:var(--bg0);color:var(--text-1)">🏢 Switch d'Accès (L2 + Port-Security)</option>
+          <option value="l3" style="background:var(--bg0);color:var(--text-1)">🌐 Switch Core (Routing + SVIs)</option>
+          <option value="bgp" style="background:var(--bg0);color:var(--text-1)">🌍 Routeur BGP Edge (2 ISP)</option>
+          <option value="qos" style="background:var(--bg0);color:var(--text-1)">☎️ QoS Voice & Video</option>
+          <option value="fw" style="background:var(--bg0);color:var(--text-1)">🔒 Firewall Edge (NAT + Policies)</option>
+          <option value="wifi" style="background:var(--bg0);color:var(--text-1)">🛜 Wireless (MAC Flapping & Roaming)</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="eqPanels"></div>
+
+    <div id="preAnalysis" style="display:none;background:var(--bg1);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px;animation:fadeIn .4s ease">
+      <div style="font-size:10px;font-weight:800;letter-spacing:2px;color:var(--cyan);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+        MOTEUR DE PRÉ-ANALYSE LOCAL
+      </div>
+      <div id="detectBadge" style="margin-bottom:16px;"></div>
+      <div id="localPatterns"></div>
+    </div>
+
+    <div style="display:flex;justify-content:center;margin-bottom:16px">
+      <button class="btn btn-ghost" onclick="document.getElementById('expertSettings').classList.toggle('open'); this.classList.toggle('active')" style="padding:8px 16px;font-size:10px;border-style:dashed; border-radius:10px;">
+        ⚙️ Paramètres Avancés (RGPD & Branding Consulting)
+      </button>
+    </div>
+
+    <div id="expertSettings" class="expert-section" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-bottom:24px;padding:20px;background:var(--bg1);border:1px solid var(--border);border-radius:12px">
+      <div>
+        <div style="font-size:10px;font-weight:800;letter-spacing:2px;color:var(--success);margin-bottom:12px">SÉCURITÉ RGPD</div>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer; background:var(--bg0); padding:12px; border-radius:8px; border:1px solid var(--border2);">
+          <input type="checkbox" id="anonymize" style="width:16px;height:16px; accent-color:var(--success);">
+          <span style="font-size:12px;font-weight:600;color:var(--text-1)">Masquage Automatique (IPs, MAC, FQDN)</span>
+        </label>
+        <button class="btn btn-ghost" onclick="previewAnonymisation()" style="margin-top:12px;width:100%;font-size:10px; color:var(--success); border-color:var(--success);">🔍 Tester le Masquage</button>
+        <div id="anonPreview" style="display:none;margin-top:8px;background:var(--bg0);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:11px;font-family:var(--font-mono);color:var(--success);max-height:100px;overflow-y:auto;white-space:pre-wrap;word-break:break-all"></div>
+        <div style="margin-top:12px;">
+          <label style="font-size:10px;font-weight:700;color:var(--text-5); margin-bottom:6px; display:block;">Mots-clés sensibles (séparés par virgule)</label>
+          <input type="text" id="customMask" placeholder="ex: NomProjetSecret, AdminUser" class="premium-input" style="width:100%">
+        </div>
+      </div>
+      
+      <div>
+        <div style="font-size:10px;font-weight:800;letter-spacing:2px;color:var(--gold);margin-bottom:12px">CO-BRANDING CONSULTING</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" id="clientName" placeholder="Nom de l'entreprise cliente" oninput="updateBrandingPreview();scheduleLookupLogo()" class="premium-input" style="flex:1; border-color:rgba(252,211,77,.3);">
+            <button class="btn btn-ghost" onclick="confirmFetchLogo()" style="color:var(--gold); border-color:var(--gold);">🔍 Logo</button>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" id="clientLogo" placeholder="URL de l'image (logo)" oninput="updateBrandingPreview()" class="premium-input" style="flex:1; border-color:rgba(252,211,77,.3);">
+            <label class="btn btn-ghost" style="color:var(--gold); border-color:var(--gold); cursor:pointer;">
+              📁 Parcourir
+              <input type="file" id="clientLogoFile" accept="image/*" style="display:none" onchange="handleLogoUpload(this)">
+            </label>
+          </div>
+          <div style="font-size:10px;color:rgba(252,211,77,.8);margin-bottom:8px;line-height:1.4">
+            ⚠️ "Chercher logo" envoie le nom du client à une API externe. En contexte confidentiel, utilisez plutôt l'upload manuel.
+          </div>
+          <svg style="width:0;height:0;position:absolute;overflow:hidden" aria-hidden="true"><defs><linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#8B5CF6"/><stop offset="100%" stop-color="#F97316"/></linearGradient></defs></svg>
+          <div id="brandingPreview" style="display:none;background:var(--bg0);border:1px solid rgba(252,211,77,.2);border-radius:10px;padding:16px; margin-top:4px;">
+            <div style="font-size:9px;color:var(--text-5);letter-spacing:1px;margin-bottom:12px;text-transform:uppercase;font-weight:700;">Aperçu de l'en-tête (Export PDF/HTML)</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+              <div style="display:flex;align-items:center;gap:12px">
+                <svg viewBox="0 0 80 100" width="24" height="30"><path d="M0,0 L0,100 L14,100 L14,22 L66,100 L80,100 L80,0 L66,0 L66,78 L14,0 Z" fill="url(#lg1)"/><polygon points="40,44 47,51 40,58 33,51" fill="#FCD34D"/></svg>
+                <div style="font-size:16px;font-weight:900;letter-spacing:4px;color:var(--text-1);margin-bottom:-2px">NEXOR</div>
+                <div style="height:20px;width:1px;background:var(--border);margin:0 4px"></div>
+                <div style="font-size:12px;color:var(--text-4)">Préparé pour</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <img id="clientLogoPreview" src="" style="display:none;height:32px;max-width:120px;object-fit:contain;border-radius:4px;background:white;padding:2px">
+                <span id="clientNamePreview" style="font-size:13px;font-weight:800;color:var(--gold)"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="drop-zone"
+      ondragover="event.preventDefault();this.style.borderColor='var(--cyan)';this.style.background='rgba(34,211,238,.08)'"
+      ondragleave="this.style.borderColor='var(--border)';this.style.background='var(--bg1)'"
+      ondrop="handleFileDrop(event)"
+      style="margin-bottom:16px;border:2px dashed var(--border);border-radius:12px;padding:32px 16px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:var(--bg1)">
+      <input type="file" accept=".log,.txt,.syslog" onchange="handleFileDrop(event)"
+        style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">
+      <div style="font-size:32px;margin-bottom:12px; opacity:0.8;">📂</div>
+      <div style="font-size:14px;color:var(--cyan);font-weight:700;margin-bottom:6px;">Glissez un fichier de logs ici ou cliquez pour parcourir</div>
+      <div style="font-size:11px;color:var(--text-5);font-weight:500;">Formats supportés : .log, .txt, .syslog · Jusqu'à 100 MB · Mode RAG activé automatiquement si > 300 lignes</div>
+    </div>
+    
+    <div id="rag-bar" style="display:none;margin-bottom:16px;background:var(--bg1);border:1px solid var(--border);border-left:4px solid var(--cyan);border-radius:10px;padding:12px 16px;align-items:center;gap:12px;flex-wrap:wrap"></div>
+    
+    <div id="err" style="display:none;background:var(--critical-bg);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:12px 16px;font-size:12px;font-weight:600;color:var(--critical);margin-bottom:16px"></div>
+    
+    <div style="text-align:center; max-width:600px; margin:0 auto;">
+      <button class="btn-analyze" id="ab" onclick="runAnalysis()" style="margin-bottom:12px; font-size:14px; padding:18px;">⚡ Lancer l'Analyse IA</button>
+      
+      <button onclick="runLocalReport()" class="btn btn-ghost" style="width:100%;margin-bottom:8px;padding:12px;border-radius:12px;font-size:11px;color:var(--lavender);border-color:var(--border);">
+        🧠 Générer le Rapport Local (Sans IA — 30 Signatures)
+      </button>
+      
+      <div id="tokenEstimate" style="font-size:10px;font-weight:600;color:var(--text-5);letter-spacing:1px;text-transform:uppercase;display:none;margin-top:12px;">
+        Temps estimé : <span id="estTime" style="color:var(--cyan)">~6s</span> <span style="margin:0 8px">|</span> Volume : <span id="estTokens" style="color:var(--cyan)">0</span> tokens
+      </div>
+    </div>
+  </div>
+
+  <div id="rp"></div>
+
+  <div id="historySection" style="display:none;margin-top:32px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+      <div>
+        <div style="font-size:10px;font-weight:800;letter-spacing:2px;color:var(--lavender);text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:8px">
+          Historique des analyses
+          <span style="color:var(--text-5); font-weight:600; text-transform:none;">(<span id="histLimitLabel">10</span> dernières)</span>
+          <select id="histLimit" class="premium-input" onchange="changeHistLimit(this.value)" style="padding:4px 8px;font-size:10px; width:auto;">
+            <option value="10" selected>10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+        <input type="text" id="histSearch" placeholder="Rechercher par équipement, erreur..." class="premium-input" oninput="renderHistory()" style="width:300px">
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-ghost no-print" onclick="exportHistory()">⬇ Export JSON</button>
+        <button class="btn btn-ghost no-print" onclick="clearHistory()" style="color:var(--critical); border-color:var(--critical-bg);">🗑 Effacer</button>
+      </div>
+    </div>
+    <div id="historyList" style="display:flex;flex-direction:column;gap:10px"></div>
+  </div>
+
+  <footer style="margin-top:60px;padding:32px 0;border-top:1px solid rgba(255,255,255,0.1);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;font-size:11px;color:#9ca3af">
+    <div>NetForge AI · Module 05 · <strong style="color:#a855f7">v8.0</strong> · NEXOR Advisory</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <a href="https://www.linkedin.com/in/romaric-okemba-27833230/" target="_blank" style="color:#a855f7;font-weight:700;text-decoration:none">Romaric Okemba</a>
+      <span style="color:#22d3ee;font-weight:600">· CCIE Wireless</span>
+      <span>· CWNE · ECSE Design · CCS-ECore</span>
+      <a href="https://www.linkedin.com/in/romaric-okemba-27833230/" target="_blank" style="display:flex;align-items:center;color:#a855f7">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+      </a>
+    </div>
+    <div style="text-align:right">Résultats à valider par un ingénieur avant application en production</div>
+  </footer>
+
+<div id="onboardingOverlay" style="display:none;position:fixed;inset:0;background:rgba(6, 4, 17, 0.9);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(10px)" onclick="if(event.target === this) closeOnboarding();">
+  <div style="background:var(--bg1);border:1px solid var(--border);border-radius:24px;padding:40px;max-width:600px;width:90%;box-shadow:0 24px 80px rgba(0,0,0,.6)">
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="font-size:32px;margin-bottom:12px">⚡</div>
+      <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:1px;margin-bottom:8px">Bienvenue sur NetForge AI</div>
+      <div style="font-size:13px;color:var(--text-2);font-weight:500;">Le TAC virtuel IA pour l'ingénierie réseau — NEXOR Advisory</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px">
+      <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:20px;display:flex;gap:16px;align-items:flex-start">
+        <div style="font-size:24px;flex-shrink:0">📂</div>
+        <div>
+          <div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:6px">1. Importez</div>
+          <div style="font-size:11px;color:var(--text-5);line-height:1.6">Collez ou glissez vos logs (Cisco, Fortinet, Juniper...). Le moteur RAG gère les gros fichiers.</div>
+        </div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:20px;display:flex;gap:16px;align-items:flex-start">
+        <div style="font-size:24px;flex-shrink:0">🛡️</div>
+        <div>
+          <div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:6px">2. Sécurisez</div>
+          <div style="font-size:11px;color:var(--text-5);line-height:1.6">Activez le masquage RGPD pour anonymiser automatiquement IPs, MAC et FQDN.</div>
+        </div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:20px;display:flex;gap:16px;align-items:flex-start">
+        <div style="font-size:24px;flex-shrink:0">🧠</div>
+        <div>
+          <div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:6px">3. Choisissez l'IA</div>
+          <div style="font-size:11px;color:var(--text-5);line-height:1.6">Utilisez Claude/Gemini (Cloud proxy) ou connectez LM Studio pour une analyse 100% locale.</div>
+        </div>
+      </div>
+      <div style="background:rgba(124,58,237,.1);border:1px solid var(--violet);border-radius:16px;padding:20px;display:flex;gap:16px;align-items:flex-start;box-shadow:inset 0 0 20px rgba(124,58,237,.1);">
+        <div style="font-size:24px;flex-shrink:0">⚡</div>
+        <div>
+          <div style="font-size:12px;font-weight:800;color:var(--cyan);margin-bottom:6px">4. Diagnostiquez</div>
+          <div style="font-size:11px;color:var(--text-2);line-height:1.6">Obtenez une RCA précise, des commandes de remédiation, et exportez en PDF.</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <label style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;color:var(--text-5);cursor:pointer">
+        <input type="checkbox" id="onboardingDontShow" style="width:16px;height:16px;accent-color:var(--violet)"> Ne plus afficher
+      </label>
+      <button id="onboardingCloseBtn" class="btn-analyze" style="width:auto;padding:12px 32px;font-size:12px;letter-spacing:2px;box-shadow:0 4px 15px rgba(124,58,237,.4);">
+        DÉMARRER
+      </button>
+    </div>
+  </div>
+</div>
+
+</main>
+</div><button class="scroll-top" id="scroll-top" aria-label="Retour en haut">
+  <svg viewBox="0 0 24 24" width="24" height="24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+
+<script>
+// =========================================================================
+// LE RESTE DU CODE JAVASCRIPT RESTE EXACTEMENT LE MÊME (LOGIQUE, RAG, IA)
+// =========================================================================
+
+// ─── STATE ───────────────────────────────────────
+const AppState = {
+  provider: 'claude',
+  apiKey: '',
+  lmUrl: 'http://localhost:1234',
+  lmModel: '',
+  lmLimit: 80,
+  mode: 'Standard',
+  equipments: [], // [{ id, name, text, logs: [], detected: null, stats: {} }]
+  history: [],
+  activeEqId: null,
+  isAnalyzing: false,
+  resolvedMacs: {}
+};
+
+let lastLogs = '';
+var ragIndex = null;
+var ragMode = false;
+var RAG_THRESHOLD = 300;
+var RAG_KEYWORDS = [
+  {re: /%[\w]+-[0-3]-/g, w: 8},
+  {re: /%[\w]+-[4-5]-/g, w: 4},
+  {re: /\b(err-disable|error|fail|failure|down|unreachable|dead|timeout|reject|denied|violation|mismatch|loop|flap|storm|critical|alarm|alert)\b/gi, w: 3},
+  {re: /\b(warning|changed|reset|restart|reload|lost|missing|invalid|incorrect)\b/gi, w: 1}
+];
+let lastResult = null;
+
+// ─── PRIVACY ENGINE v2 ───────────────────────────
+const PrivacyEngine = {
+  mapping: new Map(),
+  counts: { ip: 0, ip6: 0, mac: 0, host: 0, sens: 0 },
+
+  reset() {
+    this.mapping.clear();
+    this.counts = { ip: 0, ip6: 0, mac: 0, host: 0, sens: 0 };
+  },
+
+  _register(value, prefix, counter) {
+    const key = value.toLowerCase();
+    if (!this.mapping.has(key)) {
+      const token = `[${prefix}_${this.mapping.size + 1}]`;
+      this.mapping.set(key, token);
+      this.counts[counter]++;
+    }
+    return this.mapping.get(key);
+  },
+
+  mask(text) {
+    let t = text;
+
+    const custom = (document.getElementById('customMask')?.value || '')
+      .split(',').map(s => s.trim()).filter(s => s.length > 2);
+    custom.forEach(word => {
+      const re = new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+      t = t.replace(re, (m) => this._register(m, 'SENSITIVE', 'sens'));
+    });
+
+    t = t.replace(/\b(?:[0-9a-fA-F]{2}[:-]){5}[0-9a-fA-F]{2}\b|\b(?:[0-9a-fA-F]{4}\.){2}[0-9a-fA-F]{4}\b/g,
+      (m) => this._register(m, 'MAC', 'mac'));
+
+    t = t.replace(/\[?(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\]?|(?:[0-9a-fA-F]{1,4}:){1,7}:|(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|::(?:[fF]{4}:){0,1}(?:\d{1,3}\.){3}\d{1,3}|(?:[0-9a-fA-F]{1,4}:){1,4}:(?:\d{1,3}\.){3}\d{1,3}/g,
+      (m) => this._register(m, 'IPV6', 'ip6'));
+
+    t = t.replace(/\b(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\b/g,
+      (m) => this._register(m, 'IP', 'ip'));
+
+    t = t.replace(/\b(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.){2,}(?:fr|com|net|org|io|local|corp|int|lan|eu|be|ch|ca|uk|de)\b/g,
+      (m) => this._register(m, 'HOST', 'host'));
+
+    return t;
+  },
+
+  unmask(obj) {
+    let s = JSON.stringify(obj);
+    const entries = [...this.mapping.entries()].sort((a, b) => b[1].length - a[1].length);
+    entries.forEach(([key, token]) => {
+      const escapedToken = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      s = s.replace(new RegExp(escapedToken, 'g'), key);
+    });
+    return JSON.parse(s);
+  },
+
+  summary() {
+    const c = this.counts;
+    const parts = [];
+    if (c.ip)   parts.push(`${c.ip} IPv4`);
+    if (c.ip6)  parts.push(`${c.ip6} IPv6`);
+    if (c.mac)  parts.push(`${c.mac} MAC`);
+    if (c.host) parts.push(`${c.host} FQDN`);
+    if (c.sens) parts.push(`${c.sens} donnée(s) sensible(s)`);
+    return parts.length ? `RGPD : ${parts.join(', ')} anonymisé(s)` : '';
+  }
+};
+
+const ANALYSIS_MODES = [
+  { id: 'Standard', icon: '\u{1F50D}', desc: `Standard — Analyse exhaustive couvrant tous les types de problèmes réseau.` },
+  { id: 'Sécurité', icon: '\u{1F512}', desc: `Sécurité — Violations de port, 802.1X/RADIUS, accès non autorisés.` },
+  { id: 'Performance', icon: '\u26A1', desc: `Performance — Latences, pertes, congestion, flapping.` },
+  { id: 'Wi-Fi', icon: '\u{1F4E1}', desc: `Wi-Fi — Roaming, CAPWAP, RF, DFS radar, DHCP exhaustion.` },
+  { id: 'SD-Access', icon: '\u{1F3D7}\uFE0F', desc: `SD-Access — DNA Center, LISP/VXLAN, SGT.` },
+  { id: 'Routage', icon: '\u{1F504}', desc: `Routage — BGP, OSPF, EIGRP, redistribution, boucles.` },
+  { id: 'WAN', icon: '\u{1F310}', desc: `WAN — IPSec/IKEv2, SD-WAN, MPLS, QoS.` },
+  { id: 'Datacenter', icon: '\u{1F3ED}', desc: `Datacenter — vPC, EVPN/VXLAN, FEX, Spanning Tree.` },
+  { id: 'Hardware', icon: '\u{1F527}', desc: `Hardware — Pannes, optiques SFP, alim, mémoire.` },
+  { id: 'Forensics', icon: '\u{1F575}\uFE0F', desc: `Forensics — Timeline post-incident, IPs suspectes.` }
+];
+
+const VENDOR_SIGNATURES = [
+  { vendor: 'Cisco', os: 'IOS/IOS-XE', regex: /%[A-Z_]+-[0-7]-[A-Z_]+:|Cisco IOS Software|Router#|Switch#|\*Mar\s+\d+\s+\d+:\d+:\d+/, color: 'var(--v-cisco)' },
+  { vendor: 'Cisco', os: 'WLC 9800', regex: /%CAPWAP-|%DOT11-|%DOT1X-|%MDNS_SYSLOG-|%WLC-|%EWLC-|\*(apf|spam|emWeb|dtl|mmListen|osapi)|WLC\d*|FLASH_FULL|ucode_pkt_PPE0|%HA_INFO/i, color: 'var(--v-cisco)' },
+  { vendor: 'Cisco', os: 'ISE', regex: /CISE_|RADIUS_ACCOUNTING|NOTICE Passed-Authentication|5200 Authentication succeeded|5400 Authentication failed/, color: 'var(--v-cisco)' },
+  { vendor: 'Juniper', os: 'Junos', regex: /rpd\[\d+\]:|mgd\[\d+\]:|chassisd\[\d+\]:|fpc\d+|pfed\[|dcd\[|UI_COMMIT/, color: 'var(--v-juniper)' },
+  { vendor: 'Aruba', os: 'AOS-CX', regex: /stm:|authmgr:|sapd:|wpa_supplicant:|hostapd:|aruba-controller/, color: 'var(--v-aruba)' },
+  { vendor: 'Fortinet', os: 'FortiOS', regex: /devname=|devid=|logid=|type="utm"|subtype="/, color: 'var(--v-fortinet)' },
+  { vendor: 'Palo Alto', os: 'PAN-OS', regex: /TRAFFIC,.*?|THREAT,.*?|SYSTEM,.*?|CONFIG,.*?|HIP-MATCH,.*?/, color: 'var(--v-paloalto)' },
+  { vendor: 'Huawei', os: 'VRP', regex: /%%01|HUAWEI|VRP|OSPF\/\d|ISIS\/\d/, color: 'var(--v-huawei)' },
+  { vendor: 'Nokia', os: 'SR OS', regex: /tmnx|TiMOS|MINOR:|MAJOR:|CRITICAL:.*component/, color: 'var(--v-nokia)' },
+  { vendor: 'CheckPoint', os: 'Gaia', regex: /action=accept|action=drop|orig=|i\/f_name=|product=/, color: 'var(--v-generic)' },
+  { vendor: 'Linux', os: 'Syslog', regex: /kernel:|NetworkManager|systemd-networkd|dhclient/, color: 'var(--v-generic)' }
+];
+
+function detectVendor(logText) {
+  if (!logText || !logText.trim()) return null;
+  const lines = logText.split('\n').filter(l => l.trim().length > 0);
+  if (lines.length === 0) return null;
+
+  const matches = {};
+  let totalMatches = 0;
+
+  for (let i = 0; i < Math.min(lines.length, 1000); i++) {
+    for (const sig of VENDOR_SIGNATURES) {
+      if (sig.regex.test(lines[i])) {
+        const key = `${sig.vendor}_${sig.os}`;
+        matches[key] = (matches[key] || 0) + 1;
+        totalMatches++;
+      }
+    }
+  }
+
+  if (totalMatches === 0) return { vendor: 'Inconnu', os: 'Syslog', confidence: 0, lineCount: lines.length, firstEvent: 'N/A', lastEvent: 'N/A' };
+
+  let bestMatch = null, maxCount = 0;
+  for (const [key, count] of Object.entries(matches)) {
+    if (count > maxCount) { maxCount = count; bestMatch = key; }
+  }
+
+  const confidence = Math.min(Math.round((maxCount / Math.min(lines.length, 1000)) * 100 * 1.5), 100);
+  const [vendor, os] = bestMatch.split('_');
+  
+  let firstEvent = 'N/A', lastEvent = 'N/A';
+  const tsRegex = /^[^\w\d]*(\*?\w{3}\s+\d+\s+\d+:\d+:\d+(?:\.\d+)?|\d{4}-\d{2}-\d{2}[T\s]\d+:\d+:\d+(?:\.\d+)?Z?|\[\d{4}-\d{2}-\d{2}\s\d+:\d+:\d+\])/;
+  
+  for(let i=0; i<Math.min(lines.length, 50); i++) {
+    const m = lines[i].match(tsRegex);
+    if(m) { firstEvent = m[1]; break; }
+  }
+  for(let i=lines.length-1; i>=Math.max(0, lines.length-50); i--) {
+    const m = lines[i].match(tsRegex);
+    if(m) { lastEvent = m[1]; break; }
+  }
+
+  return { vendor, os, confidence, lineCount: lines.length, firstEvent, lastEvent };
+}
+
+const LOCAL_PATTERN_DB = [
+  { id: "stp_tc_storm", pattern: /topology change|ROOTCHANGE|TCN/i, severity: "CRITICAL", vendor: "L2", title: "STP Topology Change Storm", desc: "Reconvergences STP excessives" },
+  { id: "err_disable", pattern: /err-disable|err-disabled|errdisable/i, severity: "ERROR", vendor: "Cisco", title: "Port mis en Err-Disable", desc: "Port désactivé par le switch" },
+  { id: "interface_flap", pattern: /changed state to down/i, severity: "ERROR", vendor: "Generic", title: "Interface Flapping", desc: "Interface instable" },
+  { id: "radius_auth_failure", pattern: /Authentication.*[Ff]ailed|5400|RADIUS.*timeout/i, severity: "ERROR", vendor: "AAA", title: "Échecs d'authentification RADIUS", desc: "Clients bloqués" },
+  { id: "bgp_neighbor_down", pattern: /BGP.*neighbor.*Down|%BGP-5-ADJCHANGE.*Down/i, severity: "CRITICAL", vendor: "Routing", title: "Chute de voisinage BGP", desc: "Session BGP interrompue" },
+  { id: "ospf_neighbor_down", pattern: /OSPF.*neighbor.*state.*[Dd]own/i, severity: "CRITICAL", vendor: "Routing", title: "Perte de voisinage OSPF", desc: "Adjacence perdue" }
+];
+
+function runLocalPreAnalysis(logLines) {
+  const hits = {};
+  const maxLines = Math.min(logLines.length, 5000);
+  for (let i = 0; i < maxLines; i++) {
+    for (const pat of LOCAL_PATTERN_DB) {
+      if (pat.pattern.test(logLines[i])) {
+        if(!hits[pat.id]) hits[pat.id] = { ...pat, count: 0 };
+        hits[pat.id].count++;
+      }
+    }
+  }
+  return Object.values(hits).sort((a,b) => b.count - a.count);
+}
+
+// GUI & Events
+function updateProgressBar(step, text, pct) {
+  const rp = document.getElementById('rp');
+  if (!document.getElementById('analysisProgress')) {
+    rp.innerHTML = `
+      <div class="progress-wrap" id="analysisProgress">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <div style="font-size:10px;font-weight:800;letter-spacing:2px;color:var(--cyan)">DIAGNOSTIC EN COURS</div>
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--cyan);animation:pulse 1.2s infinite"></div>
+          <div id="progStatusText" style="font-size:11px;color:var(--text-5);margin-left:auto;font-weight:600;">Initialisation...</div>
+        </div>
+        <div id="progSteps" style="display:flex;flex-direction:column;gap:4px;"></div>
+        <div class="progress-bar-track"><div class="progress-bar-fill" id="progFill" style="width:0%"></div></div>
+      </div>
+    `;
+  }
+  const stepsDiv = document.getElementById('progSteps');
+  const steps = ['📦 Extraction et filtrage (RAG)', '🤖 Analyse Moteur IA...', '🔬 Corrélation multi-équipements...', '📋 Structuration du livrable...', '✅ Finalisation'];
+  let html = '';
+  steps.forEach((s, i) => {
+    let stateClass = i < step ? 'done' : (i === step ? 'active' : '');
+    html += `
+      <div class="progress-step ${stateClass}">
+        <div class="progress-step-icon">${i < step ? '✓' : (i + 1)}</div>
+        <span style="font-weight:${i === step ? '700' : '500'}">${s}</span>
+      </div>
+    `;
+  });
+  stepsDiv.innerHTML = html;
+  document.getElementById('progFill').style.width = pct + '%';
+  if(document.getElementById('progStatusText')) document.getElementById('progStatusText').textContent = text;
+}
+
+function showError(msg) {
+  const err = document.getElementById('err');
+  err.textContent = msg;
+  err.style.display = msg ? 'block' : 'none';
+}
+
+function generateId() { return Math.random().toString(36).substring(2, 9); }
+
+const LOCAL_MAC_DB = {
+  "00:00:0C": "Cisco Systems", "00:01:42": "Cisco Systems", "00:01:43": "Cisco Systems",
+  "00:1B:D4": "Cisco Systems", "00:1B:D5": "Cisco Systems", "00:1B:2C": "Cisco Systems",
+  "00:0B:86": "Aruba Networks", "00:1A:1E": "Aruba Networks", "00:24:6C": "Aruba Networks",
+  "00:09:0F": "Fortinet", "04:D5:90": "Fortinet", "08:5B:0E": "Fortinet",
+  "00:10:DB": "Juniper Networks", "00:17:CB": "Juniper Networks", "00:19:E2": "Juniper Networks",
+  "00:14:22": "Dell", "00:18:8B": "Dell", "00:19:B9": "Dell",
+  "00:0F:20": "Hewlett Packard", "00:11:0A": "Hewlett Packard", "00:12:79": "Hewlett Packard",
+  "00:1C:B3": "Apple", "00:1D:4F": "Apple", "00:1E:52": "Apple", "00:1F:5B": "Apple",
+  "00:21:E9": "Apple", "00:22:41": "Apple", "00:23:12": "Apple", "00:23:32": "Apple",
+  "00:00:81": "Nortel Networks", "00:04:DC": "Nortel Networks",
+  "00:90:2B": "Palo Alto Networks", "00:1B:17": "Palo Alto Networks",
+  "00:50:56": "VMware", "00:0C:29": "VMware", "00:05:69": "VMware",
+  "00:15:5D": "Microsoft", "00:03:FF": "Microsoft", "00:12:5A": "Microsoft",
+  "00:E0:4C": "Realtek", "00:1A:4D": "Realtek", "00:14:81": "Intel", "00:1B:21": "Intel",
+  "00:1F:3B": "Intel", "00:21:5C": "Intel", "00:22:FB": "Intel", "00:23:14": "Intel",
+  "00:1A:A0": "Dell", "00:1B:A1": "Dell"
+};
+
+let quickToolTimeout = null;
+async function handleQuickTool(eqId, value) {
+  const out = document.getElementById(`qt-output-${eqId}`);
+  if (!value.trim()) { out.innerHTML = ''; return; }
+  
+  const isBase64 = /^[A-Za-z0-9+/]+={0,2}$/.test(value) && value.length > 16 && !value.includes(':') && !value.includes('.');
+  if (isBase64) {
+    try {
+      const decoded = atob(value);
+      if (/^[ -~]+$/.test(decoded)) {
+        out.innerHTML = `<span style="color:var(--violet)">Base64 :</span> ${decoded}`;
+        return;
+      }
+    } catch(e) {}
+  }
+  
+  let cleanMac = value.replace(/[^a-fA-F0-9]/g, '').toUpperCase();
+  if (cleanMac.length >= 6) {
+    let prefix = cleanMac.substring(0,6);
+    let oui = `${prefix.substring(0,2)}:${prefix.substring(2,4)}:${prefix.substring(4,6)}`;
+    if (LOCAL_MAC_DB[oui]) {
+      out.innerHTML = `<span style="color:var(--cyan)">MAC Vendor :</span> <b>${LOCAL_MAC_DB[oui]}</b> (Local DB)`;
+      return;
+    }
+    
+    if(cleanMac.length === 12) {
+      out.innerHTML = `<span style="color:var(--text-5)">Recherche API...</span>`;
+      clearTimeout(quickToolTimeout);
+      quickToolTimeout = setTimeout(async () => {
+        try {
+          const res = await fetch(`https://api.macvendors.com/${oui}`);
+          if(res.ok) {
+            const vendor = await res.text();
+            out.innerHTML = `<span style="color:var(--cyan)">MAC Vendor :</span> <b>${vendor}</b> (API)`;
+          } else {
+            out.innerHTML = `<span style="color:var(--flame)">MAC Inconnue</span> <button onclick="askAIToIdentifyMAC('${eqId}', '${oui}')" style="margin-left:8px;background:var(--bg3);border:1px solid var(--border);color:var(--lavender);border-radius:4px;font-size:9px;padding:2px 6px;cursor:pointer">Demander à l'IA</button>`;
+          }
+        } catch(e) {
+          out.innerHTML = `<span style="color:var(--flame)">Erreur API (Offline)</span> <button onclick="askAIToIdentifyMAC('${eqId}', '${oui}')" style="margin-left:8px;background:var(--bg3);border:1px solid var(--border);color:var(--lavender);border-radius:4px;font-size:9px;padding:2px 6px;cursor:pointer">Demander à l'IA</button>`;
+        }
+      }, 600);
+      return;
+    }
+  }
+  
+  const isIp = /^(\d{1,3}\.){3}\d{1,3}$/.test(value.trim());
+  if (isIp) {
+    out.innerHTML = `<span style="color:var(--gold)">IP Valide</span>`;
+    return;
+  }
+  
+  out.innerHTML = '';
+}
+
+async function askAIToIdentifyMAC(eqId, oui, btnObj = null) {
+  const out = eqId !== 'none' ? document.getElementById(`qt-output-${eqId}`) : null;
+  if(out) {
+    out.innerHTML = `<span style="color:var(--text-5)">Consultation de l'IA en cours...</span>`;
+  } else if(btnObj) {
+    btnObj.innerHTML = '...'; btnObj.disabled = true;
+  }
+  
+  const prompt = `Quelle entreprise (constructeur réseau/informatique) correspond à l'adresse MAC (OUI) ${oui} ? Réponds UNIQUEMENT par le nom de l'entreprise sans aucune autre explication ni ponctuation.`;
+  
+  try {
+    let vendor = "Inconnu";
+    if (AppState.provider === 'lm') {
+      const url = (document.getElementById('lmurl') ? document.getElementById('lmurl').value.trim() : 'http://localhost:1234') + '/v1/chat/completions';
+      const model = document.getElementById('lmmodel') ? document.getElementById('lmmodel').value : 'lmstudio-community/Meta-Llama-3-8B-Instruct-GGUF';
+      const res = await fetch(url, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ model: model, messages: [{role:'user', content:prompt}], temperature:0.1, max_tokens: 20 })
+      });
+      const data = await res.json();
+      if(data.choices && data.choices[0]) vendor = data.choices[0].message.content.trim();
+    } else {
+      const endpoint = AppState.provider === 'gemini' ? '/api/gemini-analyze' : '/api/analyze';
+      const res = await fetch(endpoint, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ system: "Tu es un annuaire MAC. Réponds par un nom court.", logs: prompt })
+      });
+      const data = await res.json();
+      vendor = (data.reply || data.text || data.choices[0].message.content || "").trim();
+    }
+    
+    vendor = vendor.replace(/^['"]|['"]$/g, '');
+    if(vendor.length > 50) vendor = vendor.substring(0,50) + "...";
+    if(out) out.innerHTML = `<span style="color:var(--cyan)">MAC Vendor :</span> <b>${vendor}</b> (IA)`;
+    AppState.resolvedMacs[oui] = vendor + " (IA)";
+    updatePreAnalysis();
+  } catch(e) {
+    if(out) out.innerHTML = `<span style="color:var(--critical)">Échec de l'IA (Vérifiez la connexion)</span>`;
+    else if(btnObj) { btnObj.innerHTML = 'IA'; btnObj.disabled = false; }
+  }
+}
+
+function renderEqTabs() {
+  const container = document.getElementById('eqTabs');
+  const panels = document.getElementById('eqPanels');
+  const addBtn = `<button class="eq-add" onclick="addEquipment()" ${AppState.equipments.length >= 8 ? 'style="display:none"' : ''}>+ Nouveau <span style="font-size:9px;opacity:.6">${AppState.equipments.length}/8</span></button>`;
+  
+  let tabsHtml = '', panelsHtml = '';
+  
+  AppState.equipments.forEach((eq) => {
+    const isActive = eq.id === AppState.activeEqId;
+    const vColor = eq.detected ? (VENDOR_SIGNATURES.find(v => v.vendor === eq.detected.vendor) || {}).color || 'var(--v-generic)' : 'var(--border)';
+    
+    tabsHtml += `
+      <div class="eq-tab ${isActive ? 'active' : ''}" onclick="selectEquipment('${eq.id}')">
+        <div class="eq-dot" style="background:${vColor};box-shadow:0 0 8px ${vColor}60"></div>
+        ${eq.detected ? `<span style="font-size:8px;font-weight:900;color:${vColor};letter-spacing:1px">${eq.detected.vendor.substring(0,5).toUpperCase()}</span>` : ''}
+        <span id="tab-name-${eq.id}" contenteditable="true" onblur="renameEq('${eq.id}', this.textContent)" onkeypress="if(event.key==='Enter'){this.blur();return false;}" style="outline:none;min-width:50px">${eq.name}</span>
+        ${AppState.equipments.length > 1 ? `<button class="eq-close" onclick="event.stopPropagation();removeEquipment('${eq.id}')">×</button>` : ''}
+      </div>
+    `;
+    
+    panelsHtml += `
+        <div id="dz-${eq.id}" style="display:${isActive ? 'block' : 'none'}; background:var(--bg1); border:1px solid var(--border); border-radius:12px; overflow:hidden;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--border)">
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+              <input type="text" placeholder="🔍 Rechercher dans les logs…" oninput="searchInLogs('${eq.id}', this.value)" class="premium-input" style="padding:6px 12px;width:180px">
+              <span id="search-count-${eq.id}" style="font-size:10px;color:var(--gold);font-weight:600;"></span>
+              
+              <div style="display:flex;align-items:center;gap:6px;background:var(--bg0);border:1px solid var(--border2);border-radius:6px;padding:4px 10px">
+                <span style="font-size:9px;color:var(--text-5);font-weight:700;">FILTRE TEMP:</span>
+                <input type="text" id="timeStart-${eq.id}" placeholder="Start" value="${eq.timeStart || ''}" oninput="saveEqTime('${eq.id}');onLogsInput('${eq.id}')" style="background:transparent;border:none;color:var(--cyan);font-family:var(--font-mono);font-size:10px;width:110px; outline:none;">
+                <span style="color:var(--text-5)">→</span>
+                <input type="text" id="timeEnd-${eq.id}" placeholder="End" value="${eq.timeEnd || ''}" oninput="saveEqTime('${eq.id}');onLogsInput('${eq.id}')" style="background:transparent;border:none;color:var(--cyan);font-family:var(--font-mono);font-size:10px;width:110px; outline:none;">
+                ${eq.timeStart ? `<button onclick="clearEqTime('${eq.id}')" style="background:none;border:none;color:var(--critical);cursor:pointer;font-size:14px;font-weight:bold;">×</button>` : ''}
+              </div>
+            </div>
+            <button class="btn btn-ghost" onclick="toggleFullscreenLogs('${eq.id}')" style="padding:6px 12px;font-size:10px">🔲 Plein écran</button>
+          </div>
+          
+          <div style="background:var(--bg0); border-bottom:1px solid var(--border); padding:8px 16px; display:flex; gap:12px; align-items:center;">
+             <span style="font-size:10px;font-weight:800;color:var(--text-5);letter-spacing:1px">QUICK TOOLS</span>
+             <input type="text" id="qt-input-${eq.id}" placeholder="Coller MAC, IP ou Base64..." oninput="handleQuickTool('${eq.id}', this.value)" class="premium-input" style="padding:4px 10px; font-size:11px; width:220px; border-radius:4px; border:1px solid var(--border2); background:var(--bg1);">
+             <div id="qt-output-${eq.id}" style="font-size:11px; color:var(--text-2); font-family:var(--font-mono);"></div>
+          </div>
+
+          <textarea id="lg-${eq.id}" oninput="onLogsInput('${eq.id}')" rows="18" 
+            style="width:100%;min-height:300px;background:var(--bg0);border:none;padding:16px;font-family:var(--font-mono);font-size:12px;color:var(--lavender);line-height:1.7;resize:vertical;outline:none;" 
+            placeholder="Collez les logs bruts de ${eq.name} ici..."></textarea>
+          
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--bg2);border-top:1px solid var(--border)">
+            <div style="display:flex;gap:16px;align-items:center">
+               <div style="font-size:11px;font-weight:600;color:var(--text-2)"><span id="lc-tot-${eq.id}" style="color:var(--lavender);font-family:var(--font-mono);font-weight:800">${eq.stats.lines || 0}</span> lignes tot.</div>
+               <div style="font-size:11px;font-weight:600;color:var(--text-2)"><span id="lc-env-${eq.id}" style="color:var(--cyan);font-family:var(--font-mono);font-weight:800">${eq.stats.filtered || 0}</span> envoyées</div>
+               
+               <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-left:8px;">
+                  <input type="checkbox" id="prefilter-${eq.id}" style="accent-color:var(--violet)" ${eq.stats.prefilter ? 'checked' : ''} onchange="onLogsInput('${eq.id}')">
+                  <span style="font-size:10px;color:var(--text-2);font-weight:600">Préfiltre Intelligent (Warn/Crit)</span>
+               </label>
+            </div>
+            <div style="display:flex;gap:12px;align-items:center">
+              <select onchange="loadDemo(this.value, '${eq.id}'); this.value=''" class="premium-input" style="padding:4px 8px;font-size:10px;">
+                <option value="" disabled selected>📋 Charger une démo / Template...</option>
+                <option value="cisco">🔵 Cisco Catalyst (STP/Port-Sec)</option>
+                <option value="wlc">📡 Cisco WLC 9800 (Dot1X)</option>
+                <option value="forti">🔴 FortiGate (HA/IPSec)</option>
+                <option value="bgp">🌍 Template BGP Flapping</option>
+                <option value="ospf">🔗 Template OSPF Auth Failure</option>
+                <option value="dhcp">🎛️ Template DHCP Starvation</option>
+              </select>
+              <button class="btn btn-ghost" onclick="copyEqLogs('${eq.id}')" style="padding:6px 12px;font-size:10px;color:var(--cyan);border-color:var(--cyan)">📋 Copier</button>
+              <button class="btn btn-ghost" onclick="clearEqLogs('${eq.id}')" style="padding:6px 12px;font-size:10px;color:var(--critical);border-color:rgba(239,68,68,.3)">🗑 Vider</button>
+            </div>
+          </div>
+        </div>
+    `;
+  });
+  
+  container.innerHTML = tabsHtml + addBtn;
+  panels.innerHTML = panelsHtml;
+  
+  AppState.equipments.forEach(eq => {
+    const ta = document.getElementById(`lg-${eq.id}`);
+    if(ta && eq.text !== undefined) ta.value = eq.text;
+  });
+  updatePreAnalysis();
+}
+
+function addEquipment(name, text = '') {
+  if (AppState.equipments.length >= 8) return;
+  const id = generateId();
+  AppState.equipments.push({ id, name: name || `FW/Routeur ${AppState.equipments.length + 1}`, text: text, detected: null, stats: { lines: 0, filtered: 0, prefilter: true }, timeStart: '', timeEnd: '' });
+  AppState.activeEqId = id;
+  renderEqTabs();
+  if(text) onLogsInput(id);
+}
+
+function selectEquipment(id) { AppState.activeEqId = id; renderEqTabs(); }
+function removeEquipment(id) { AppState.equipments = AppState.equipments.filter(e => e.id !== id); if (AppState.activeEqId === id && AppState.equipments.length > 0) AppState.activeEqId = AppState.equipments[0].id; renderEqTabs(); }
+function renameEq(id, newName) { const eq = AppState.equipments.find(e => e.id === id); if(eq) { eq.name = newName.trim() || `Appareil`; renderEqTabs(); } }
+
+function clearEqLogs(id) {
+  const eq = AppState.equipments.find(e => e.id === id);
+  if (!eq) return;
+  if(confirm(`Vider les logs de ${eq.name} ?`)){
+    eq.text = '';
+    const ta = document.getElementById(`lg-${id}`);
+    if(ta) ta.value = '';
+    onLogsInput(id);
+  }
+}
+
+function copyEqLogs(id) {
+  const eq = AppState.equipments.find(e => e.id === id);
+  if (!eq || !eq.text) return showToast('Aucun log à copier.', 'error');
+  navigator.clipboard.writeText(eq.text).then(() => {
+    showToast('Logs copiés dans le presse-papier !', 'success');
+  }).catch(() => {
+    showToast('Erreur lors de la copie.', 'error');
+  });
+}
+
+function saveEqTime(eqId) {
+  const eq = AppState.equipments.find(e => e.id === eqId);
+  if (!eq) return;
+  const tsStartEl = document.getElementById(`timeStart-${eqId}`);
+  const tsEndEl   = document.getElementById(`timeEnd-${eqId}`);
+  if (tsStartEl) eq.timeStart = tsStartEl.value.trim();
+  if (tsEndEl)   eq.timeEnd   = tsEndEl.value.trim();
+}
+
+function clearEqTime(eqId) {
+  const eq = AppState.equipments.find(e => e.id === eqId);
+  if (!eq) return;
+  eq.timeStart = ''; eq.timeEnd = '';
+  renderEqTabs(); onLogsInput(eqId);
+}
+
+function onLogsInput(eqId) {
+  const ta = document.getElementById(`lg-${eqId}`);
+  if(!ta) return;
+  const eq = AppState.equipments.find(e => e.id === eqId);
+  if(!eq) return;
+  eq.text = ta.value;
+  AppState.activeEqId = eqId;
+
+  const allLines = eq.text.split('\n').filter(l => l.trim().length > 0);
+  const count = allLines.length;
+
+  if (!eq.hasAutoRenamed && count > 0 && /^(Équipement|Appareil|FW\/Routeur)/i.test(eq.name)) {
+    let hostnameMatch = null;
+    for (let i = 0; i < Math.min(allLines.length, 50); i++) {
+      let m = allLines[i].match(/^<([A-Za-z0-9\-_]+)>/); // Huawei
+      if(m) { hostnameMatch = m[1]; break; }
+      m = allLines[i].match(/^([A-Za-z0-9\-_]+)[#>]/); // Cisco/Forti prompt
+      if(m) { hostnameMatch = m[1]; break; }
+      m = allLines[i].match(/(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d+\s+\d{2}:\d{2}:\d{2}(?:\.\d+)?\s+([A-Za-z0-9\-_]+)\s+%/); // Syslog
+      if(m && m[1] !== 'localhost') { hostnameMatch = m[1]; break; }
+      m = allLines[i].match(/devname="?([A-Za-z0-9\-_]+)"?/); // Fortinet syslog
+      if(m) { hostnameMatch = m[1]; break; }
+    }
+    if (hostnameMatch) {
+      eq.name = hostnameMatch;
+      eq.hasAutoRenamed = true;
+      const tabNameEl = document.getElementById(`tab-name-${eq.id}`);
+      if(tabNameEl) tabNameEl.textContent = hostnameMatch;
+    }
+  }
+
+  const prefilterEl = document.getElementById(`prefilter-${eqId}`);
+  const prefilter = prefilterEl ? prefilterEl.checked : true;
+
+  let processed = allLines;
+  
+  if (!eq.timeExtracted && processed.length > 0) {
+    const firstMatch = processed[0].match(/([A-Z][a-z]{2}\s+\d+\s+\d{2}:\d{2}:\d{2}|\d{4}-\d{2}-\d{2}[T\s]\d{2}:\d{2}:\d{2})/);
+    if(firstMatch) eq.timeStart = firstMatch[0];
+    const lastMatch = processed[processed.length - 1].match(/([A-Z][a-z]{2}\s+\d+\s+\d{2}:\d{2}:\d{2}|\d{4}-\d{2}-\d{2}[T\s]\d{2}:\d{2}:\d{2})/);
+    if(lastMatch) eq.timeEnd = lastMatch[0];
+    eq.timeExtracted = true;
+    
+    const tsStartEl = document.getElementById(`timeStart-${eqId}`);
+    const tsEndEl = document.getElementById(`timeEnd-${eqId}`);
+    if(tsStartEl && eq.timeStart) tsStartEl.value = eq.timeStart;
+    if(tsEndEl && eq.timeEnd) tsEndEl.value = eq.timeEnd;
+  }
+
+  if (eq.timeStart || eq.timeEnd) {
+    let startIndex = 0;
+    let endIndex = processed.length - 1;
+    if (eq.timeStart) {
+      const idx = processed.findIndex(l => l.includes(eq.timeStart));
+      if(idx !== -1) startIndex = idx;
+    }
+    if (eq.timeEnd) {
+      for(let i = processed.length - 1; i >= 0; i--) {
+        if(processed[i].includes(eq.timeEnd)) { endIndex = i; break; }
+      }
+    }
+    if(startIndex <= endIndex) processed = processed.slice(startIndex, endIndex + 1);
+  }
+
+  if (prefilter) {
+    processed = processed.filter(l => /%[A-Z0-9_]+-[0-4]-|EMERG|CRIT|ERR|WARN|Alert|DOWN|FAIL/i.test(l));
+  }
+
+  eq.stats = { total: count, lines: count, filtered: processed.length, prefilter };
+  
+  if (eqId === AppState.activeEqId) updateRAGStatus(eq.text);
+
+  const oldVendor = eq.detected ? eq.detected.vendor : null;
+  eq.detected = detectVendor(eq.text);
+  const newVendor = eq.detected ? eq.detected.vendor : null;
+
+  const lcTot = document.getElementById(`lc-tot-${eqId}`);
+  const lcEnv = document.getElementById(`lc-env-${eqId}`);
+  if (lcTot) lcTot.textContent = count;
+  if (lcEnv) lcEnv.textContent = processed.length;
+
+  if (oldVendor !== newVendor) renderEqTabs();
+  updateEstimates();
+  updatePreAnalysis();
+}
+
+function updatePreAnalysis() {
+  const activeEq = AppState.equipments.find(e => e.id === AppState.activeEqId);
+  const pa = document.getElementById('preAnalysis');
+  if(!activeEq || !activeEq.text) { pa.style.display = 'none'; return; }
+  
+  pa.style.display = 'block';
+  const detBadge = document.getElementById('detectBadge');
+  if(activeEq.detected) {
+    const vColor = (VENDOR_SIGNATURES.find(v => v.vendor === activeEq.detected.vendor) || {}).color || 'var(--v-generic)';
+    detBadge.innerHTML = `
+      <div style="background:var(--bg0);border:1px solid var(--border);padding:16px;border-radius:12px;display:flex;align-items:center;gap:16px">
+        <div style="width:12px;height:12px;border-radius:50%;background:${vColor};box-shadow:0 0 12px ${vColor}"></div>
+        <div>
+          <div style="font-size:14px;font-weight:900;color:var(--text-1);letter-spacing:1px">${activeEq.detected.vendor} ${activeEq.detected.os}</div>
+          <div style="font-size:11px;color:var(--text-5);font-weight:600;">Confiance ${activeEq.detected.confidence}%</div>
+        </div>
+      </div>
+    `;
+  } else { detBadge.innerHTML = ''; }
+  
+  const hits = runLocalPreAnalysis(activeEq.text.split('\n').filter(l=>l.trim().length>0));
+  
+  // -- AUTO PROFILING MAC & IP --
+  const extractTop = (regex, ignoreList = []) => {
+    const matches = activeEq.text.match(regex) || [];
+    const counts = {};
+    matches.forEach(m => {
+       const key = m.toLowerCase();
+       if (ignoreList.some(ig => key.includes(ig))) return;
+       counts[key] = (counts[key] || 0) + 1;
+    });
+    return Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 3);
+  };
+  const topMacs = extractTop(/([0-9a-fA-F]{2}[:-]){5}([0-9a-fA-F]{2})|([0-9a-fA-F]{4}\.[0-9a-fA-F]{4}\.[0-9a-fA-F]{4})/g, ['ff:ff:ff']);
+  const topIps = extractTop(/\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/g, ['0.0.0.0', '255.255.255.255', '127.0.0.1']);
+
+  const lp = document.getElementById('localPatterns');
+  
+  let score = 100;
+  hits.forEach(h => {
+    if(h.severity === 'CRITICAL') score -= h.count * 10;
+    else if(h.severity === 'ERROR') score -= h.count * 5;
+    else if(h.severity === 'WARNING') score -= h.count * 2;
+  });
+  if(score < 0) score = 0;
+  
+  let sColor = 'var(--cyan)';
+  let sText = 'Normal';
+  if(score < 50) { sColor = 'var(--critical)'; sText = 'Critique'; }
+  else if(score < 80) { sColor = 'var(--flame)'; sText = 'Avertissement'; }
+  else if(score < 100) { sColor = 'var(--gold)'; sText = 'Mineur'; }
+  
+  let hitsHtml = '';
+  if(hits.length > 0) {
+    hitsHtml = hits.slice(0,10).map(h => {
+       const color = h.severity === 'CRITICAL' ? 'var(--critical)' : (h.severity === 'ERROR' ? 'var(--flame)' : 'var(--warning)');
+       return `<div style="display:flex;align-items:center;gap:10px;background:var(--bg0);border:1px solid ${color}40;border-left:4px solid ${color};padding:10px 16px;border-radius:10px;font-size:12px;color:var(--text-1);">
+           <span style="font-weight:900;color:${color};font-size:14px">${h.count}x</span>
+           <span style="font-weight:600">${h.title}</span>
+         </div>`;
+    }).join('');
+  } else {
+    hitsHtml = `<div style="font-size:12px;color:var(--text-5);font-style:italic;padding:12px 0;">Aucun pattern d'erreur reconnu.</div>`;
+  }
+
+  let html = `
+    <div style="margin-top:20px;display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;">
+      <div style="background:var(--bg0);border:1px solid var(--border);border-radius:12px;padding:16px;min-width:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+        <div style="font-size:10px;font-weight:800;color:var(--text-5);text-transform:uppercase;letter-spacing:1px;text-align:center;">Indice de<br>Santé</div>
+        <div style="position:relative;width:64px;height:64px;border-radius:50%;background:conic-gradient(${sColor} ${score}%, var(--bg3) 0);display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px ${sColor}40">
+          <div style="width:54px;height:54px;border-radius:50%;background:var(--bg0);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--text-1)">${score}</div>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:${sColor}">${sText}</div>
+      </div>
+      <div style="flex:1; display:flex; flex-direction:column; gap:16px;">
+        <div>
+          <div style="font-size:10px;font-weight:800;color:var(--text-2);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Signatures Locales (Offline)</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            ${hitsHtml}
+          </div>
+        </div>
+        
+        <div style="display:flex; gap:16px; flex-wrap:wrap">
+          ${topMacs.length > 0 ? `
+            <div style="flex:1; min-width:200px;">
+              <div style="font-size:10px;font-weight:800;color:var(--text-2);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">📌 Top MACs Suspectes</div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                ${topMacs.map(m => {
+                  let clean = m[0].replace(/[^a-fA-F0-9]/g, '').toUpperCase();
+                  let prefix = clean.substring(0,6);
+                  let oui = `${prefix.substring(0,2)}:${prefix.substring(2,4)}:${prefix.substring(4,6)}`;
+                  let vendor = AppState.resolvedMacs[oui] || LOCAL_MAC_DB[oui] || 'Inconnu';
+                  let vendorHtml = `<span style="color:var(--text-5);font-size:10px;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${vendor}">${vendor}</span>`;
+                  if(vendor === 'Inconnu') {
+                    vendorHtml += ` <button onclick="askAIToIdentifyMAC('none', '${oui}', this)" style="background:var(--bg3);border:1px solid var(--border);color:var(--lavender);border-radius:4px;font-size:8px;padding:2px 4px;cursor:pointer" title="Résoudre avec l'IA">IA</button>`;
+                  }
+                  return `<div style="background:var(--bg0);border:1px solid var(--border);padding:6px 12px;border-radius:6px;font-size:11px;display:flex;justify-content:space-between;align-items:center;">
+                    <span style="color:var(--lavender);font-family:var(--font-mono)">${m[0]}</span>
+                    <div style="display:flex;gap:8px;align-items:center">
+                      ${vendorHtml}
+                      <span style="background:var(--cyan);color:#000;font-weight:800;padding:2px 6px;border-radius:4px;font-size:9px">${m[1]}x</span>
+                    </div>
+                  </div>`;
+                }).join('')}
+              </div>
+            </div>
+          ` : ''}
+          ${topIps.length > 0 ? `
+            <div style="flex:1; min-width:200px;">
+              <div style="font-size:10px;font-weight:800;color:var(--text-2);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">🌍 Top IPs Source/Dest</div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                ${topIps.map(m => `
+                  <div style="background:var(--bg0);border:1px solid var(--border);padding:6px 12px;border-radius:6px;font-size:11px;display:flex;justify-content:space-between;align-items:center;">
+                    <span style="color:var(--gold);font-family:var(--font-mono)">${m[0]}</span>
+                    <span style="background:var(--gold);color:#000;font-weight:800;padding:2px 6px;border-radius:4px;font-size:9px">${m[1]}x</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+  lp.innerHTML = html;
+}
+
+function updateEstimates() {
+  const activeEqs = AppState.equipments.filter(e => e.text && e.text.trim().length > 0);
+  let totalLines = 0;
+  activeEqs.forEach(eq => totalLines += (eq.stats.lines || 0));
+  const isRag = ragMode && ragIndex && totalLines > RAG_THRESHOLD;
+  const effectiveLines = isRag ? Math.min(totalLines, 8 * 30) : totalLines;
+  const tokens = Math.ceil(effectiveLines * 12);
+  const time = Math.ceil(5 + (effectiveLines / 400));
+  const tTime = document.getElementById('estTime');
+  const tTok = document.getElementById('estTokens');
+  if(tTime) tTime.textContent = isRag ? `~${time}s (RAG)` : `~${time}s`;
+  if(tTok) tTok.textContent = tokens.toLocaleString();
+  document.getElementById('tokenEstimate').style.display = totalLines > 0 ? 'block' : 'none';
+}
+
+// ─── RAG (Retrieval-Augmented Generation) ─────────
+function buildRAGIndex(text) {
+  const allLines = text.split('\n').filter(l => l.trim().length > 0);
+  const CHUNK = 40;
+  const chunks = [];
+  for (let i = 0; i < allLines.length; i += CHUNK) {
+    const lines = allLines.slice(i, Math.min(i + CHUNK, allLines.length));
+    const chunkText = lines.join('\n');
+    let score = 0;
+    RAG_KEYWORDS.forEach(kw => {
+      kw.re.lastIndex = 0;
+      const matches = chunkText.match(new RegExp(kw.re.source, kw.re.flags));
+      score += (matches ? matches.length : 0) * kw.w;
+    });
+    chunks.push({ idx: i, text: chunkText, lineCount: lines.length, score });
+  }
+  ragIndex = { chunks, totalLines: allLines.length };
+  return ragIndex;
+}
+
+function extractRelevantChunks(maxChunks) {
+  if (!ragIndex || !ragIndex.chunks.length) return null;
+  const maxC = maxChunks || 8;
+  const sorted = ragIndex.chunks.slice().sort((a, b) => b.score - a.score);
+  const top = sorted.slice(0, maxC).sort((a, b) => a.idx - b.idx);
+  const text = top.map((c, i) => `--- [Segment ${i+1}/${top.length} · lignes ${c.idx+1}-${c.idx+c.lineCount}] ---\n${c.text}`).join('\n\n');
+  const sentLines = top.reduce((s, c) => s + c.lineCount, 0);
+  return { text, totalLines: ragIndex.totalLines, sentLines, segmentsUsed: top.length, totalSegments: ragIndex.chunks.length };
+}
+
+function updateRAGStatus(text) {
+  const n = (text||'').split('\n').filter(l => l.trim()).length;
+  if (n >= RAG_THRESHOLD && !ragMode) {
+    ragMode = true;
+    const idx = buildRAGIndex(text);
+    showRAGBar('ready', {totalLines: idx.totalLines, totalSegments: idx.chunks.length});
+  } else if (n < RAG_THRESHOLD && ragMode) {
+    ragMode = false; ragIndex = null;
+    showRAGBar('hidden', null);
+  }
+}
+
+function handleFileDrop(event) {
+  event.preventDefault(); event.stopPropagation();
+  document.getElementById('drop-zone').style.borderColor = 'var(--border)';
+  const file = (event.dataTransfer ? event.dataTransfer.files[0] : null) || (event.target ? event.target.files[0] : null);
+  if (!file) return;
+  if (file.size > 100 * 1024 * 1024) { showError('Fichier trop volumineux (> 100 MB).'); return; }
+  
+  showRAGBar('loading', {name: file.name});
+  const reader = new FileReader();
+  reader.onload = e => {
+    const text = e.target.result;
+    const activeEq = AppState.equipments.find(eq => eq.id === AppState.activeEqId);
+    if (activeEq) {
+      activeEq.text = text;
+      document.getElementById('lg-' + activeEq.id).value = text;
+      onLogsInput(activeEq.id);
+    }
+  };
+  reader.readAsText(file, 'utf-8');
+}
+
+function showRAGBar(state, data) {
+  const bar = document.getElementById('rag-bar');
+  if (!bar) return;
+  if (state === 'hidden') { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  if (state === 'loading') {
+    bar.innerHTML = `<span style="font-size:20px">⏳</span> <span style="font-size:12px;font-weight:700;color:var(--cyan)">Lecture du fichier ${data.name}...</span>`;
+  } else if (state === 'ready') {
+    bar.innerHTML = `
+      <span style="font-size:24px">🧠</span>
+      <div>
+        <div style="font-size:12px;font-weight:900;color:var(--success);letter-spacing:1px">MOTEUR RAG ACTIF</div>
+        <div style="font-size:11px;color:var(--text-5);font-weight:500;">Le fichier est volumineux (${data.totalLines.toLocaleString()} lignes). Le RAG va extraire uniquement les ${data.totalSegments} segments contenant des erreurs.</div>
+      </div>
+    `;
+  } else if (state === 'sent') {
+    bar.innerHTML = `
+      <span style="font-size:24px">🧠</span>
+      <div>
+        <div style="font-size:12px;font-weight:900;color:var(--success);letter-spacing:1px">SEGMENTS RAG ENVOYÉS À L'IA</div>
+        <div style="font-size:11px;color:var(--text-5);font-weight:500;">Compression : ${data.sentLines.toLocaleString()} lignes envoyées sur ${data.totalLines.toLocaleString()} au total.</div>
+      </div>
+    `;
+  }
+}
+
+function closeOnboarding() {
+  document.getElementById('onboardingOverlay').style.display = 'none';
+  if(document.getElementById('onboardingDontShow')?.checked) {
+    localStorage.setItem('nf_onboarding_done', 'true');
+  }
+}
+
+// ─── INIT & STARTUP ──────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  if (!localStorage.getItem('nf_onboarding_done')) {
+    const ov = document.getElementById('onboardingOverlay');
+    if (ov) ov.style.display = 'flex';
+  }
+  const closeBtn = document.getElementById('onboardingCloseBtn');
+  if (closeBtn) closeBtn.addEventListener('click', closeOnboarding);
+  
+  const modeGrid = document.getElementById('modeGrid');
+  if(modeGrid) {
+    modeGrid.innerHTML = ANALYSIS_MODES.map(m => `
+      <button class="mode-btn ${m.id === AppState.mode ? 'active' : ''}" onclick="setMode('${m.id}')" title="${m.desc}">
+        <span style="font-size:16px">${m.icon}</span> ${m.id}
+      </button>
+    `).join('');
+  }
+  
+  if(AppState.equipments.length === 0) addEquipment('Équipement 1');
+  
+  try {
+    const hist = localStorage.getItem('nf_v3_history');
+    if (hist) {
+      AppState.history = JSON.parse(hist);
+      const savedLimit = localStorage.getItem('nf_hist_limit');
+      if (savedLimit) {
+        document.getElementById('histLimit').value = savedLimit;
+        document.getElementById('histLimitLabel').textContent = savedLimit;
+      }
+      renderHistory();
+    }
+  } catch(e){}
+  
+  // HTTPS / LM Studio Check
+  if (window.location.protocol === 'https:') {
+    const warn = document.getElementById('lm-https-warn');
+    if(warn) warn.style.display = 'block';
+  } else {
+    // If local file, hide download button
+    const dl = document.getElementById('download-standalone');
+    if(dl) dl.style.display = 'none';
+  }
+});
+
+function setMode(mId) {
+  AppState.mode = mId;
+  document.getElementById('modeGrid').innerHTML = ANALYSIS_MODES.map(m => `
+    <button class="mode-btn ${m.id === AppState.mode ? 'active' : ''}" onclick="setMode('${m.id}')" title="${m.desc}">
+      <span style="font-size:16px">${m.icon}</span> ${m.id}
+    </button>
+  `).join('');
+}
+
+function setProvider(p) {
+  AppState.provider = p;
+  document.querySelectorAll('#pb-claude, #pb-gemini, #pb-lm').forEach(b => b.classList.remove('on'));
+  document.getElementById(`pb-${p}`).classList.add('on');
+  
+  document.getElementById('cfg-claude').style.display = (p === 'claude' || p === 'gemini') ? 'flex' : 'none';
+  document.getElementById('cfg-lm').style.display = p === 'lm' ? 'block' : 'none';
+  
+  if(p === 'gemini') showToast('🚀 Gemini Flash activé', 'info');
+  else if(p === 'claude') showToast('☁️ Claude Sonnet activé', 'info');
+}
+
+function setProviderLM() {
+  if (window.location.protocol === 'https:') {
+    showToast("LM Studio nécessite l'outil local. Téléchargez le fichier.", "warning");
+  }
+  setProvider('lm');
+}
+
+function testLMStudio() {
+  const url = (document.getElementById('lmurl').value || 'http://localhost:1234').trim();
+  const st = document.getElementById('lmstatus');
+  st.textContent = 'Test en cours...'; st.style.color = 'var(--gold)';
+  fetch(url + '/v1/models', {method:'GET'})
+    .then(r => r.json())
+    .then(d => {
+      st.textContent = '✅ Connecté avec succès !'; st.style.color = 'var(--success)';
+      if(d.data && d.data.length && !document.getElementById('lmmodel').value) {
+        document.getElementById('lmmodel').value = d.data[0].id;
+      }
+    })
+    .catch(e => {
+      st.textContent = '❌ Injoignable. Vérifiez que LM Studio tourne sur le bon port.';
+      st.style.color = 'var(--critical)';
+    });
+}
+
+function loadDemo(type, eqId) {
+  const demos = {
+    cisco: "%PM-4-ERR_DISABLE: psecure-violation error detected on Gi1/0/24, putting Gi1/0/24 in err-disable state\n%PORT_SECURITY-2-PSECURE_VIOLATION: Security violation occurred, caused by MAC address 0011.2233.4455 on port Gi1/0/24",
+    wlc: "*emWeb: %CAPWAP-3-ERRORLOG: AP 9130-Floor2 has disconnected. Reason: Discovery request not received",
+    forti: "date=2024-05-15 time=10:26:12 devname=\"FG100E\" devid=\"FG100ETK\" logid=\"0100032003\" type=\"event\" subtype=\"system\" level=\"critical\" vd=\"root\" logdesc=\"PSU failure\" msg=\"Power supply unit 2 has failed\"",
+    bgp: "%BGP-5-ADJCHANGE: neighbor 192.168.1.2 Down BGP Notification sent\n%BGP-5-ADJCHANGE: neighbor 192.168.1.2 Up",
+    ospf: "%OSPF-5-ADJCHG: Process 1, Nbr 10.0.0.1 on GigabitEthernet0/0 from FULL to DOWN, Neighbor Down: Dead timer expired\n%OSPF-5-ADJCHG: Process 1, Nbr 10.0.0.1 on GigabitEthernet0/0 from LOADING to FULL, Loading Done",
+    dhcp: "%DHCP_SNOOPING-5-DHCP_SNOOPING_MATCH_MAC_FAIL: DHCP_SNOOPING drop message because the chaddr doesn't match source mac\n%DHCP_SNOOPING-5-DHCP_SNOOPING_UNTRUSTED_PORT: DHCP_SNOOPING drop message on untrusted port"
+  };
+  if(demos[type]) {
+    const eq = AppState.equipments.find(e => e.id === eqId);
+    if(eq) {
+      eq.timeExtracted = false;
+      eq.timeStart = '';
+      eq.timeEnd = '';
+    }
+    document.getElementById(`lg-${eqId}`).value = demos[type];
+    onLogsInput(eqId);
+    showToast("Logs d'exemple chargés.", "success");
+  }
+}
+
+function toggleFullscreenLogs(eqId) {
+  const zone = document.getElementById(`dz-${eqId}`);
+  const ta = document.getElementById(`lg-${eqId}`);
+  if (!document.fullscreenElement) {
+    zone.requestFullscreen().then(() => {
+      ta.style.height = "calc(100vh - 60px)";
+      ta.style.fontSize = "14px";
+    });
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+document.addEventListener('fullscreenchange', () => {
+  AppState.equipments.forEach(eq => {
+    const ta = document.getElementById(`lg-${eq.id}`);
+    if (!ta) return;
+    if (!document.fullscreenElement) {
+      ta.style.height = "300px";
+      ta.style.fontSize = "12px";
+    }
+  });
+});
+
+function searchInLogs(eqId, query) {
+  const ta = document.getElementById(`lg-${eqId}`);
+  const count = document.getElementById(`search-count-${eqId}`);
+  if (!ta || !query) { if(count) count.textContent = ''; return; }
+  
+  try {
+    const regex = new RegExp(query, 'gi');
+    const matches = ta.value.match(regex);
+    if(count) count.textContent = matches ? `${matches.length} occ.` : '0 occ.';
+    const firstMatch = ta.value.search(regex);
+    if (firstMatch !== -1) {
+       const linesBefore = ta.value.substring(0, firstMatch).split('\n').length - 1;
+       const lineHeight = parseInt(getComputedStyle(ta).lineHeight);
+       ta.scrollTop = linesBefore * lineHeight;
+    }
+  } catch(e) {}
+}
+
+// ─── BRANDING & RGPD ──────────────────────────────
+function previewAnonymisation() {
+  const activeEq = AppState.equipments.find(e => e.id === AppState.activeEqId);
+  const preview = document.getElementById('anonPreview');
+  if (!activeEq || !activeEq.text) return showToast("Collez d'abord des logs.", "warning");
+  
+  PrivacyEngine.reset();
+  const sample = activeEq.text.split('\n').slice(0, 5).join('\n');
+  const masked = PrivacyEngine.mask(sample);
+  preview.style.display = 'block';
+  preview.textContent = masked;
+}
+
+let _logoTimer;
+function scheduleLookupLogo() {
+  clearTimeout(_logoTimer);
+  _logoTimer = setTimeout(() => confirmFetchLogo(true), 1500);
+}
+function confirmFetchLogo(silent = false) {
+  const name = document.getElementById('clientName').value.trim();
+  if(!name) return;
+  const logo = document.getElementById('clientLogo');
+  // Utilisation de l'API Google Favicon à la place de Clearbit
+  logo.value = `https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${name.toLowerCase().replace(/\s/g,'')}.com&size=128`;
+  updateBrandingPreview();
+  if(!silent) showToast("Logo récupéré", "success");
+}
+function handleLogoUpload(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    document.getElementById('clientLogo').value = e.target.result;
+    updateBrandingPreview();
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+function updateBrandingPreview() {
+  const name = document.getElementById('clientName').value.trim();
+  const logo = document.getElementById('clientLogo').value.trim();
+  const preview = document.getElementById('brandingPreview');
+  if(name || logo) {
+    preview.style.display = 'block';
+    document.getElementById('clientNamePreview').textContent = name;
+    if(logo) {
+      document.getElementById('clientLogoPreview').src = logo;
+      document.getElementById('clientLogoPreview').style.display = 'block';
+    }
+  } else preview.style.display = 'none';
+}
+
+// ─── MOTEUR IA CALLS ──────────────────────────────
+const SYS = `Tu es l'Expert Technique de référence absolue (Architecte / TAC Niveau 3) au sein du cabinet de conseil haut de gamme NEXOR Advisory, spécialiste en ingénierie réseaux et sécurité multi-constructeurs (Cisco, Fortinet, Aruba, etc.).
+Ton objectif est d'accompagner des clients très exigeants en fournissant une analyse systémique, extrêmement approfondie et d'une fiabilité irréprochable basée sur des données maîtrisées. Tu dois IMPÉRATIVEMENT rédiger toutes tes analyses et explications EN FRANÇAIS (French).
+Ne te contente jamais d'une analyse basique de Niveau 1. Fournis toujours des explications pédagogiques, cohérentes, détaillées et professionnelles.
+ATTENTION : TOUTE cette expertise, tes explications et ta pédagogie doivent être rédigées EXCLUSIVEMENT à l'intérieur des champs du format JSON demandé (notamment dans "summary" et "rca").
+
+RÈGLES D'EXPERTISE STRICTES :
+1. MAC Flapping / Roaming Wi-Fi : Si tu observes des "MAC FLAP" (ex: %SW_MATM-4-MACFLAP_NOTIF) entre deux ports spécifiques de manière répétée avec des adresses MAC différentes, n'indique pas immédiatement une boucle réseau L2. Analyse s'il s'agit de clients (smartphones/laptops) qui "roament" entre deux Access Points Wi-Fi connectés sur ces ports. Recommande systématiquement de vérifier la nature des ports (ex: via 'show cdp neighbors' ou 'show lldp neighbors') avant de proposer de modifier la configuration (comme passer le port en access).
+2. Sévérité Contextuelle : Un événement isolé n'est pas critique. Évalue la fréquence et l'impact sur la topologie. Un flap Wi-Fi est souvent "Info" (Sévérité 2/10), tandis qu'une vraie boucle L2 avec tempête de broadcast est 10/10.
+3. Vérification (Verify) avant Correction (Fix) : Ne propose jamais de commandes destructives sans proposer au préalable des commandes de vérification (show mac address-table, show interfaces trunk, etc.).
+
+RÈGLES DE FORMATAGE JSON (CRITIQUE) :
+- Ne génère ABSOLUMENT AUCUN texte d'introduction, ni de conclusion, ni de bloc Markdown en dehors du JSON.
+- Ta réponse entière doit pouvoir être parsée par JSON.parse().
+- Échappe obligatoirement les guillemets internes dans les chaînes de caractères avec un antislash (\").
+- Ne mets pas de virgule finale (trailing comma) avant une accolade ou un crochet fermant.
+
+Format de réponse IMPÉRATIF : JSON strict.
+{
+  "summary": "Résumé de l'incident avec contexte expert.",
+  "equipment_info": "Marque, Modèle ou OS déduits des logs (ex: Cisco IOS, FortiGate, etc.). Utile si la marque est inconnue.",
+  "score": 2, // Note de sévérité globale sur 10 (ex: 2 pour du roaming normal, 10 pour boucle L2)
+  "confidence": 95,
+  "events": [{ "time": "10:22:15", "lvl": "WARNING", "code": "MACFLAP", "desc": "Description détaillée", "eq": "SW1", "count": 1 }],
+  "timeline": [{ "time": "10:22", "desc": "Événement précis", "eq": "SW1" }],
+  "rca": "Analyse causale profonde (Root Cause Analysis). Explique le pourquoi systémique (ex: Roaming Wi-Fi vs Boucle L2).",
+  "fix": ["conf t", "..."], // Laisse vide si aucune action n'est requise
+  "verify": ["show cdp neighbors", "show mac address-table"], // Commandes de diagnostic préalables
+  "next_steps": ["Confirmer avec l'équipe Wi-Fi que les ports sont des APs"],
+  "normal_items": ["Log ignoré normal"]
+}`;
+
+async function runAnalysis() {
+  const activeEqs = AppState.equipments.filter(e => e.text && e.text.trim().length > 0);
+  if (activeEqs.length === 0) return showError('Veuillez importer des logs réseau.');
+  
+  showError('');
+  const ab = document.getElementById('ab');
+  ab.disabled = true; ab.innerHTML = 'Analyse en cours...';
+
+  updateProgressBar(1, 'Préparation des logs...', 20);
+
+  const isAnon = document.getElementById('anonymize')?.checked;
+  if (isAnon) PrivacyEngine.reset();
+
+  let payloadLogs = `MODE: ${AppState.mode}\n\n`;
+  activeEqs.forEach(eq => {
+    payloadLogs += `--- EQUIPEMENT: ${eq.name} ---\n`;
+    let text = eq.text;
+    if (ragMode && eq.id === AppState.activeEqId) {
+      const ragEx = extractRelevantChunks(8);
+      if(ragEx) text = ragEx.text;
+    } else {
+      text = text.split('\n').slice(-1000).join('\n'); // fallback limit
+    }
+    if (isAnon) text = PrivacyEngine.mask(text);
+    payloadLogs += text + '\n\n';
+  });
+
+  updateProgressBar(2, 'Interrogation du modèle IA...', 50);
+
+  try {
+    let rawJson = "";
+    if (AppState.provider === 'lm') {
+      const url = document.getElementById('lmurl').value.trim() + '/v1/chat/completions';
+      const res = await fetch(url, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ model: document.getElementById('lmmodel').value, messages: [{role:'system', content:SYS}, {role:'user', content:payloadLogs}], temperature:0.1 })
+      });
+      const data = await res.json().catch(() => ({}));
+      
+      if (!res.ok) {
+        throw new Error(data.error?.message || "Le serveur local (LM Studio) a rejeté la requête. Vérifiez la taille du contexte (Context Length).");
+      }
+      if (!data.choices || !data.choices[0]) {
+        throw new Error("Réponse vide ou inattendue du modèle local.");
+      }
+      
+      const choice = data.choices[0];
+      if (choice.finish_reason === 'length') {
+        throw new Error("Le modèle a manqué de mémoire en cours de réflexion (Context Length atteint : 4096 tokens max). Veuillez augmenter la taille du contexte dans LM Studio (ex: 8192) ou réduire le nombre de lignes de logs envoyées.");
+      }
+      
+      rawJson = choice.message?.content || "";
+      if (!rawJson.trim() && choice.message?.reasoning_content) {
+         throw new Error("Ce modèle est un modèle de 'raisonnement' (comme Nemotron/DeepSeek-R1) mais il a été coupé avant de donner sa réponse finale. Augmentez le Context Length dans LM Studio.");
+      }
+    } else {
+      // Proxy Netlify pour Claude / Gemini
+      const endpoint = AppState.provider === 'gemini' ? '/api/gemini-analyze' : '/api/analyze';
+      const res = await fetch(endpoint, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ system: SYS, logs: payloadLogs })
+      });
+      if(!res.ok) throw new Error("Erreur Proxy API");
+      const data = await res.json();
+      rawJson = data.reply || data.text || data.choices[0].message.content;
+    }
+
+    updateProgressBar(3, 'Génération du rapport...', 80);
+    
+    // Extrait le JSON
+    const s = rawJson.indexOf('{');
+    const e = rawJson.lastIndexOf('}');
+    if (s === -1 || e === -1) throw new Error("L'IA n'a retourné aucun format JSON.");
+
+    let jsonStr = rawJson.slice(s, e+1);
+    
+    // Nettoyage de survie pour les petits modèles locaux (Gemma, Phi)
+    jsonStr = jsonStr.replace(/,\s*([}\]])/g, '$1'); // Retire les trailing commas
+    jsonStr = jsonStr.replace(/[\r\n\t]/g, ' ');      // Remplace les retours à la ligne par des espaces pour éviter les crashs
+
+    let parsed;
+    try {
+      parsed = JSON.parse(jsonStr);
+    } catch (parseError) {
+      console.error("JSON Parse Error:", parseError, "RAW String:", jsonStr);
+      throw new Error(`Syntaxe JSON invalide générée par le modèle (ex: guillemets non échappés). Détail: ${parseError.message}. Essayez de relancer ou d'utiliser un modèle plus permissif.`);
+    }
+    
+    if(isAnon) parsed = PrivacyEngine.unmask(parsed);
+
+    lastResult = parsed;
+    lastLogs = payloadLogs;
+    updateProgressBar(4, 'Terminé.', 100);
+    renderDashboard(parsed, activeEqs);
+
+  } catch(e) {
+    showError("Erreur lors de l'analyse : " + e.message);
+  } finally {
+    ab.disabled = false; ab.innerHTML = '⚡ Lancer l\'Analyse IA';
+  }
+}
+
+// ─── DASHBOARD ───────────────────────────────────
+function renderDashboard(r, eqs) {
+  const rp = document.getElementById('rp');
+  const sColor = r.score >= 8 ? 'var(--critical)' : r.score >= 5 ? 'var(--flame)' : r.score >= 3 ? 'var(--gold)' : 'var(--success)';
+  
+  let h = `<div class="card-dark" style="padding:0; overflow:hidden; border-color:${sColor};">`;
+  
+  const clientName = document.getElementById('clientName')?.value.trim() || '';
+  const clientLogo = document.getElementById('clientLogo')?.value.trim() || '';
+  let brandingHtml = '';
+  if(clientName || clientLogo) {
+    brandingHtml = `<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.05);">
+      ${clientLogo ? `<img src="${clientLogo}" style="height:32px;max-width:120px;object-fit:contain;border-radius:4px;background:#fff;padding:4px;">` : ''}
+      ${clientName ? `<span style="font-size:14px;font-weight:800;color:var(--gold);letter-spacing:1px;text-transform:uppercase;">${clientName}</span>` : ''}
+      <span style="font-size:9px;font-weight:700;color:var(--text-4);letter-spacing:1px;text-transform:uppercase;margin-left:auto;">PARTENAIRE NEXOR</span>
+    </div>`;
+  }
+
+  // Header
+  h += `
+    <div class="rp-header" style="background:var(--bg3);">
+      ${brandingHtml}
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div style="font-size:10px;font-weight:900;letter-spacing:2px;color:var(--cyan);margin-bottom:8px;">RAPPORT D'ANALYSE IA</div>
+          <p style="font-size:16px;font-weight:800;color:var(--text-1);max-width:600px;line-height:1.4">${r.summary || 'Analyse terminée'}</p>
+        </div>
+        <div class="sev-counter" style="border-color:${sColor};">
+          <div style="font-size:28px;font-weight:900;color:${sColor};">${r.score}/10</div>
+          <div style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--text-2);">SÉVÉRITÉ</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  h += `<div style="padding:24px;">`;
+
+  if (r.equipment_info) {
+    h += `<div style="margin-bottom:20px;font-size:12px;color:var(--cyan);background:rgba(34,211,238,.1);padding:10px 14px;border-radius:8px;border-left:4px solid var(--cyan);"><b>IDENTIFICATION IA :</b> ${r.equipment_info}</div>`;
+  }
+
+  // RCA
+  if (r.rca) {
+    h += `
+      <div class="rca-block">
+        <div class="rca-header" onclick="this.nextElementSibling.classList.toggle('open')">
+          <span style="font-size:16px;">🔍</span>
+          <div style="font-size:12px;font-weight:800;letter-spacing:2px;color:var(--flame);flex:1">ANALYSE CAUSALE (RCA)</div>
+        </div>
+        <div class="rca-body open">
+          <p class="rca-text">${r.rca.replace(/\n/g, '<br>')}</p>
+        </div>
+      </div>
+    `;
+  }
+
+  // FIX
+  if (r.fix && r.fix.length > 0) {
+    h += `
+      <div style="margin-top:20px;">
+        <div style="font-size:11px;font-weight:800;letter-spacing:2px;color:var(--success);margin-bottom:8px">🛠️ PLAN CORRECTIF CLI</div>
+        <div class="code-block" style="position:relative;">
+          <div class="code-block-header" style="display:flex;justify-content:space-between;align-items:center;">
+            <span>COMMANDES À APPLIQUER</span>
+            <button class="no-print" onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.innerText); this.innerHTML='Copié !'; setTimeout(() => this.innerHTML='📋 Copier', 2000);" style="background:var(--bg3);border:1px solid var(--border);color:var(--text-3);padding:2px 8px;border-radius:4px;font-size:9px;cursor:pointer;transition:all 0.2s;">📋 Copier</button>
+          </div>
+          <pre>${r.fix.join('\n')}</pre>
+        </div>
+      </div>
+    `;
+  }
+
+  h += `
+      <div style="margin-top:30px;display:flex;gap:12px;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:20px;" class="no-print">
+        <button onclick="window.print()" class="btn btn-ghost" style="flex:1;padding:12px;font-size:12px;color:var(--cyan);border-color:var(--cyan);">📄 Exporter PDF (Natif)</button>
+        <button onclick="exportDashboardHTML()" class="btn btn-ghost" style="flex:1;padding:12px;font-size:12px;color:var(--lavender);border-color:var(--lavender);">🌐 Exporter HTML (Standalone)</button>
+        <button onclick="exportDashboardCSV()" class="btn btn-ghost" style="flex:1;padding:12px;font-size:12px;color:var(--success);border-color:var(--success);">📊 Exporter CSV (Data)</button>
+      </div>
+  </div></div>`;
+  rp.innerHTML = h;
+  rp.scrollIntoView({behavior: 'smooth'});
+}
+
+// Boutons Historique
+function toggleHistory() {
+  const hs = document.getElementById('historySection');
+  hs.style.display = hs.style.display === 'none' ? 'block' : 'none';
+}
+function clearHistory() {
+  if(!confirm("Effacer tout l'historique ?")) return;
+  AppState.history = []; localStorage.removeItem('nf_v3_history');
+  document.getElementById('historyList').innerHTML = '';
+}
+function exportHistory() {
+  const blob = new Blob([JSON.stringify(AppState.history, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'historique.json'; a.click();
+}
+
+function exportDashboardCSV() {
+  if (!lastResult) return showError("Aucun rapport à exporter.");
+  let csv = "Time,Level,Code,Description,Equipment,Count\n";
+  if(lastResult.events) {
+    lastResult.events.forEach(e => {
+      csv += `"${e.time || ''}","${e.lvl || ''}","${e.code || ''}","${(e.desc||'').replace(/"/g, '""')}","${e.eq || ''}","${e.count || 1}"\n`;
+    });
+  }
+  const blob = new Blob([csv], {type: "text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `rapport_reseau_${new Date().getTime()}.csv`;
+  a.click();
+}
+
+function exportDashboardHTML() {
+  if (!lastResult) return showError("Aucun rapport à exporter.");
+  const rp = document.getElementById('rp');
+  const clone = document.createElement('div');
+  clone.innerHTML = rp.innerHTML;
+  clone.querySelectorAll('.no-print').forEach(n => n.remove());
+  
+  const htmlDoc = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Rapport d'Analyse Réseau</title>
+<style>
+  body { background: #0b071a; color: #e2e8f0; font-family: sans-serif; padding: 40px; line-height: 1.5; }
+  .card-dark { background: #130f25; border: 2px solid #334155; border-radius: 12px; overflow: hidden; max-width: 1000px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  .rp-header { background: #1e1b4b; padding: 24px; border-bottom: 1px solid #3730a3; }
+  .sev-counter { float: right; text-align: center; border: 2px solid; border-radius: 50%; width: 64px; height: 64px; display: flex; flex-direction: column; justify-content: center; }
+  .rca-block { background: rgba(249,115,22,.1); border-left: 4px solid #f97316; padding: 16px; margin: 20px 0; border-radius: 6px; }
+  .code-block { background: #000; padding: 16px; border-radius: 8px; font-family: monospace; color: #c4b5fd; margin-top:10px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
+  th, td { border-bottom: 1px solid #334155; padding: 10px; text-align: left; }
+  th { background: #1e293b; color: #94a3b8; }
+</style>
+</head>
+<body>
+  ${clone.innerHTML}
+</body>
+</html>`;
+  const blob = new Blob([htmlDoc], {type: "text/html;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `rapport_reseau_${new Date().getTime()}.html`;
+  a.click();
+}
+
+// Boutons Locaux
+function runLocalReport() {
+  const eq = AppState.equipments.find(e => e.id === AppState.activeEqId);
+  if(!eq || !eq.text) return showError("Pas de logs.");
+  const patterns = runLocalPreAnalysis(eq.text.split('\n'));
+  const rp = document.getElementById('rp');
+  
+  let h = `<div class="card-dark" style="border-color:var(--cyan)">
+    <div class="rp-header" style="background:var(--bg3)">
+      <div style="font-size:10px;font-weight:900;letter-spacing:2px;color:var(--cyan);margin-bottom:8px;">RAPPORT LOCAL (SANS IA)</div>
+      <p style="font-size:14px;color:var(--text-1);font-weight:700;">Détection basée sur 30 signatures hors-ligne.</p>
+    </div>
+    <div style="padding:24px;">`;
+    
+  if (patterns.length) {
+    patterns.forEach(p => {
+      h += `<div style="background:var(--bg0);border-left:4px solid var(--flame);padding:12px;border-radius:8px;margin-bottom:12px;">
+        <strong style="color:var(--flame)">[${p.severity}] ${p.title} (${p.count}x)</strong>
+        <p style="font-size:12px;color:var(--text-2);margin-top:4px;">${p.desc}</p>
+      </div>`;
+    });
+  } else {
+    h += `<p style="color:var(--success);font-weight:700;">✅ Aucun pattern critique détecté localement.</p>`;
+  }
+  h += `</div></div>`;
+  rp.innerHTML = h;
+  rp.scrollIntoView({behavior:'smooth'});
+}
+
+// ─── CHARGEMENT DES SCÉNARIOS (LOGS DE TEST) ─────────
+function loadSampleLogs(type, label) {
+  let logs = "";
+  switch(type) {
+    case "l2":
+      logs = `Mar 14 10:20:01 switch-acc-1 %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet1/0/2, changed state to down
+Mar 14 10:20:05 switch-acc-1 %LINK-3-UPDOWN: Interface GigabitEthernet1/0/2, changed state to down
+Mar 14 10:25:12 switch-acc-1 %PORT_SECURITY-2-PSECURE_VIOLATION: Security violation occurred, caused by MAC address 00:1A:2B:3C:4D:5E on port GigabitEthernet1/0/5.
+Mar 14 10:25:12 switch-acc-1 %PM-4-ERR_DISABLE: psecure-violation error detected on Gi1/0/5, putting Gi1/0/5 in err-disable state`;
+      break;
+    case "l3":
+      logs = `Apr 02 14:10:00 core-sw-1 %OSPF-5-ADJCHG: Process 1, Nbr 10.0.0.5 on Vlan10 from FULL to DOWN, Neighbor Down: Dead timer expired
+Apr 02 14:10:02 core-sw-1 %HSRP-5-STATECHANGE: Vlan10 Grp 1 state Active -> Speak
+Apr 02 14:10:10 core-sw-1 %HSRP-5-STATECHANGE: Vlan10 Grp 1 state Speak -> Standby
+Apr 02 14:12:00 core-sw-1 %OSPF-5-ADJCHG: Process 1, Nbr 10.0.0.5 on Vlan10 from LOADING to FULL, Loading Done`;
+      break;
+    case "bgp":
+      logs = `Jun 20 08:00:15 edge-rtr-1 %BGP-5-ADJCHANGE: neighbor 192.168.100.2 Down BGP Notification sent
+Jun 20 08:00:15 edge-rtr-1 %BGP-3-NOTIFICATION: sent to neighbor 192.168.100.2 4/0 (hold time expired) 0 bytes
+Jun 20 08:05:22 edge-rtr-1 %BGP-5-ADJCHANGE: neighbor 192.168.100.2 Up`;
+      break;
+    case "qos":
+      logs = `Oct 11 09:12:44 rtr-branch %QOS-4-CONGESTION: Interface WAN1 output drops detected.
+Oct 11 09:15:00 rtr-branch %VOICE-4-JITTER: Excessive jitter detected on SIP trunk 10.20.30.40.
+Oct 11 09:15:30 rtr-branch %QOS-3-POLICY_FAILURE: Failed to apply service-policy VOICE_OUT on WAN1.`;
+      break;
+    case "fw":
+      logs = `Nov 05 16:20:10 ftd-01 %ASA-4-106023: Deny tcp src outside:192.0.2.5/45000 dst inside:10.10.10.50/443 by access-group "OUTSIDE-IN"
+Nov 05 16:25:01 ftd-01 %ASA-2-106001: Inbound TCP connection denied from 203.0.113.10/33333 to 10.10.10.10/22 flags SYN on interface outside
+Nov 05 16:30:15 ftd-01 %ASA-3-201008: Disallowing new connections.`;
+      break;
+    case "wifi":
+      logs = `May 18 14:11:38.622: %SW_MATM-4-MACFLAP_NOTIF: Host 3aad.7e52.9493 in vlan 50 is flapping between port Gi1/0/1 and port Gi1/0/3
+May 18 14:13:20.565: %SW_MATM-4-MACFLAP_NOTIF: Host 3aad.7e52.9493 in vlan 50 is flapping between port Gi1/0/1 and port Gi1/0/3
+May 18 14:13:31.704: %SW_MATM-4-MACFLAP_NOTIF: Host 3aad.7e52.9493 in vlan 50 is flapping between port Gi1/0/3 and port Gi1/0/1
+May 18 14:35:20.613: %SW_MATM-4-MACFLAP_NOTIF: Host 9291.9881.18d2 in vlan 50 is flapping between port Gi1/0/1 and port Gi1/0/3
+May 18 14:41:46.702: %SW_MATM-4-MACFLAP_NOTIF: Host d065.78d1.2c48 in vlan 50 is flapping between port Gi1/0/3 and port Gi1/0/1
+May 18 14:42:20.203: %SW_MATM-4-MACFLAP_NOTIF: Host a208.aaac.eeb8 in vlan 50 is flapping between port Gi1/0/1 and port Gi1/0/3`;
+      break;
+  }
+  const activeEq = AppState.equipments.find(e => e.id === AppState.activeEqId);
+  if(activeEq) {
+    const ta = document.getElementById(`ta-${activeEq.id}`);
+    if(ta) {
+      ta.value = logs;
+      activeEq.text = logs;
+      onLogsInput(activeEq.id);
+      showToast('Scénario chargé : ' + label, 'success');
+    }
+  } else {
+    showToast('Veuillez ajouter un équipement d\'abord.', 'error');
+  }
+}
+
+</script>
+<script>window.NX_TOOL_ID = 'module05';</script>
+<script src="../js/netforge-assistant.js" defer></script>
+</body>
+</html>

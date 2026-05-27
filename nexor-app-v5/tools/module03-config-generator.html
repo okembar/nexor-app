@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NetForge AI — Config Generator · Module 03 · NEXOR Advisory</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="Générateur de configurations réseau multi-constructeurs — NEXOR Advisory. Module 03 de la suite NetForge AI.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   NETFORGE AI — MODULE 03 : CONFIG GENERATOR
+   Design System : NEXOR Canvas (Enterprise SaaS)
+   Palette Module 03 : Flame / Solar
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  /* ADN NEXOR Canvas */
+  --void: #060411; /* Deep Space */
+  --deep: #0D0820; /* Cartes */
+  --dark: #13092A; /* Inputs & Éléments secondaires */
+  --mid:  #1A0D3B; 
+  --dusk: #6B7280; 
+
+  /* Identité Module 03 : Énergie & Exécution */
+  --primary:   #F97316; /* Flame */
+  --primary-d: #EA580C;
+  --accent:    #FCD34D; /* Solar */
+  --warm:      #FDE68A;
+  --sage:      #ffedd5;
+  --teal-hl:   #22D3EE;
+
+  /* Status */
+  --alert: #EF4444; --warn: #F59E0B; --info: #3B82F6; --ok: #10B981;
+
+  /* Typographie */
+  --text-1: #F8FAFC; --text-2: #CBD5E1; --text-3: #E2E8F0;
+  --text-4: #F97316; --text-5: #64748B;
+
+  /* Bordures Premium */
+  --border:   rgba(124, 58, 237, 0.25);
+  --border-h: rgba(124, 58, 237, 0.45);
+
+  /* Gradients */
+  --grad-m03: linear-gradient(135deg, #F97316 0%, #F59E0B 50%, #FCD34D 100%);
+  --grad-band: linear-gradient(90deg, #5B21B6, #7C3AED, #F97316, #22D3EE, #FCD34D);
+  --grad-text: linear-gradient(135deg, #FDE68A 0%, #F97316 45%, #F59E0B 100%);
+
+  /* Géométrie */
+  --nav-h: 64px; --radius: 16px; --radius-sm: 10px;
+  --shadow: 0 10px 40px rgba(0,0,0,.4);
+
+  --font-ui:   'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+  --t-fast: 150ms ease; --t-norm: 250ms ease;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--font-ui); background: var(--void); color: var(--text-2); line-height: 1.6; overflow-x: hidden; }
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; font-family: inherit; border: none; background: none; }
+input, select, textarea { font-family: inherit; }
+
+/* Scrollbar Premium */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--void); }
+::-webkit-scrollbar-thumb { background: rgba(124, 58, 237, 0.4); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--primary) !important;
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.15) !important;
+}
+
+/* ── Animations ── */
+@keyframes spin    { to{transform:rotate(360deg)} }
+@keyframes pulse   { 0%,100%{opacity:.4} 50%{opacity:1} }
+@keyframes fadeIn  { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes float   { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+@keyframes toastIn { from{transform:translateX(120%)} to{transform:translateX(0)} }
+@keyframes aurora  { 0%,100%{opacity:.7} 50%{opacity:1} }
+
+/* ── Aurora Band ── */
+.aurora-band { height:3px; background:var(--grad-band); animation:aurora 4s ease-in-out infinite; }
+
+/* ═══════════ LOCK SCREEN ═══════════ */
+#lock::before {
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 50% at 50% 10%,rgba(249, 115, 22, 0.07),transparent 70%);
+  pointer-events:none;
+}
+
+/* ═══════════ NAV ═══════════ */
+#app { display:block; }
+.nav-bar { position:sticky;top:0;z-index:200; }
+.nav { 
+  background:rgba(6, 4, 17, 0.85); backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border); height:var(--nav-h);
+  display:flex; align-items:center; justify-content:space-between; padding:0 28px; 
+}
+.nav-logo { display:flex;align-items:center;gap:12px;text-decoration:none; }
+.nav-logo-nexor { font-size:14px;font-weight:900;letter-spacing:5px;color:var(--text-1);line-height:1; }
+.nav-logo-adv   { font-size:6px;font-weight:300;letter-spacing:7px;color:#A78BFA;margin-top:3px; }
+.nav-module { display:flex;align-items:center;gap:8px;padding-left:16px;margin-left:12px;border-left:1px solid var(--border); }
+.nav-badge { 
+  display:inline-flex; align-items:center; gap:6px; 
+  background:rgba(249, 115, 22, 0.1); border:1px solid rgba(249, 115, 22, 0.25); 
+  border-radius:20px; padding:4px 12px; font-size:8px; font-weight:800; 
+  letter-spacing:2px; text-transform:uppercase; color:var(--primary); 
+}
+.nav-badge::before { content:'';width:6px;height:6px;border-radius:50%;background:var(--primary);animation:pulse 2s infinite; }
+.nav-actions { display:flex;align-items:center;gap:8px; }
+.btn-n { display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;transition:all var(--t-fast);font-family:var(--font-ui); }
+.btn-n-g { color:var(--text-2);border:1px solid var(--border);background:transparent; }
+.btn-n-g:hover { border-color:var(--primary);color:var(--primary);background:rgba(249, 115, 22, 0.05); }
+.btn-n-p { color:var(--void);background:var(--grad-m03);border:none; }
+.btn-n-p:hover { filter:brightness(1.1);transform:translateY(-1px); }
+
+/* ═══════════ LAYOUT ═══════════ */
+main { max-width:1400px;margin:0 auto;padding:0 24px 80px; }
+
+/* Hero strip Premium */
+.hero-strip {
+  position:relative; padding:60px 24px; text-align:center; border-bottom:1px solid var(--border); margin-bottom: 32px;
+  background-image: url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=2000&q=80');
+  background-size: cover; background-position: center;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+.hero-strip::before { content: ''; position: absolute; inset: 0; background: rgba(6, 4, 17, 0.88); z-index: 1; }
+.hero-left, .hero-stats { position:relative; z-index:2; }
+
+.hero-tag { display:inline-flex;align-items:center;gap:8px;background:rgba(249, 115, 22, 0.1);border:1px solid rgba(249, 115, 22, 0.25);border-radius:20px;padding:5px 14px;margin-bottom:16px;font-size:8px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--primary); }
+.hero-tag .dot { width:5px;height:5px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite; }
+.hero-title { font-size:clamp(32px, 4vw, 48px); font-weight:900; line-height:1.15; margin-bottom:12px; color:var(--text-1); letter-spacing:-1px; }
+.hero-title .grad { background:var(--grad-m03);-webkit-background-clip:text;-webkit-text-fill-color:transparent; }
+.hero-sub { font-size:14px;font-weight:500;color:var(--text-2);line-height:1.8;max-width:800px;margin:0 auto; }
+.hero-stats { display:flex;gap:40px;flex-wrap:wrap; margin-top:24px; justify-content:center; }
+.h-stat { display:flex;flex-direction:column; align-items:center; }
+.h-stat-n { font-size:24px;font-weight:900;color:var(--text-1);line-height:1; margin-bottom:4px; }
+.h-stat-l { font-size:8px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text-5); }
+
+/* Cards */
+.card { background:var(--deep);border:1px solid var(--border);border-radius:var(--radius);padding:24px;transition:border-color var(--t-norm); box-shadow: var(--shadow); }
+.card:hover { border-color:var(--border-h); }
+.card-accent { border-top:2px solid var(--primary); }
+
+/* ── Vendor Selector ── */
+.vendor-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px; }
+.vendor-btn {
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:12px 8px;border-radius:var(--radius-sm);
+  border:1px solid var(--border);background:var(--dark);
+  font-size:9px;font-weight:700;letter-spacing:.5px;color:var(--text-5);
+  cursor:pointer;transition:all .2s;text-align:center;font-family:var(--font-ui);
+}
+.vendor-btn:hover { border-color:var(--primary);color:var(--text-2); background:rgba(249, 115, 22, 0.05); }
+.vendor-btn.active { border-color:var(--primary);background:rgba(249, 115, 22, 0.1);color:var(--accent); box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15); }
+.vendor-btn .v-icon { font-size:20px;line-height:1; }
+.vendor-btn .v-name { font-size:8px;font-weight:800;letter-spacing:.5px; }
+
+/* ── Config Type Selector ── */
+.ctype-list { display:flex;flex-direction:column;gap:6px; }
+.ctype-btn {
+  display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;
+  border:1px solid var(--border);background:var(--dark);
+  font-size:10px;font-weight:700;color:var(--text-5);cursor:pointer;transition:all .2s;
+  font-family:var(--font-ui);text-align:left;
+}
+.ctype-btn:hover { background:rgba(249, 115, 22, 0.05);color:var(--text-2); border-color:var(--primary); }
+.ctype-btn.active { background:rgba(249, 115, 22, 0.1);border-color:var(--primary);color:var(--accent); }
+.ctype-btn .ct-icon { width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:rgba(0,0,0,.2); }
+.ctype-btn.active .ct-icon { background:rgba(249, 115, 22, 0.2); }
+.ctype-meta { font-size:9px;color:var(--text-5);margin-top:2px;font-weight:500;letter-spacing:.5px; }
+
+/* ── Form elements ── */
+.form-group { margin-bottom:16px; }
+.form-label { font-size:9px;font-weight:800;letter-spacing:2px;color:var(--primary);text-transform:uppercase;display:block;margin-bottom:8px; }
+.form-input,.form-select {
+  width:100%;background:var(--dark);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:10px 14px;font-size:12px;color:var(--text-1);transition:all .2s;
+}
+.form-input { font-family:var(--font-mono); }
+.form-select { appearance:none;cursor:pointer; }
+select option { background: var(--bg1); color: var(--text-1); }
+.form-input::placeholder { color:var(--text-5); }
+.form-input.valid { border-color:var(--ok)!important; }
+.form-hint { font-size:10px;color:var(--text-5);margin-top:6px;line-height:1.5; }
+
+/* Dynamic rows */
+.dyn-row { display:flex;gap:8px;align-items:center;margin-bottom:8px; }
+.dyn-row .form-input { flex:1;margin-bottom:0; }
+.dyn-add { width:100%;padding:10px;background:transparent;border:1px dashed var(--border);border-radius:var(--radius-sm);font-size:10px;font-weight:800;letter-spacing:1px;color:var(--text-5);cursor:pointer;text-transform:uppercase;transition:all .2s;font-family:var(--font-ui);margin-top:8px; }
+.dyn-add:hover { border-color:var(--primary);color:var(--primary); background:rgba(249, 115, 22, 0.05); }
+.dyn-del { width:32px;height:32px;border-radius:8px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#ef4444;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s; }
+.dyn-del:hover { background:rgba(239,68,68,.2); }
+
+/* Checkbox row */
+.chk-row { display:flex;align-items:center;gap:10px;margin-bottom:12px; background:var(--dark); padding:10px 14px; border-radius:8px; border:1px solid var(--border); }
+.chk-row input[type=checkbox] { width:16px;height:16px;accent-color:var(--primary);cursor:pointer; }
+.chk-row label { font-size:11px;color:var(--text-2);font-weight:600;cursor:pointer;flex:1; }
+
+/* ── CTA button ── */
+.cta-btn { width:100%;padding:16px;background:var(--grad-m03);border:none;border-radius:12px;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--void);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;position:relative;overflow:hidden;font-family:var(--font-ui);box-shadow:0 4px 20px rgba(249, 115, 22, 0.3); margin-top:20px; }
+.cta-btn::after { content:'';position:absolute;inset:0;background:linear-gradient(rgba(255,255,255,.2),transparent); }
+.cta-btn:hover { filter:brightness(1.15);transform:translateY(-2px);box-shadow:0 8px 30px rgba(249, 115, 22, 0.4); }
+.cta-btn:disabled { opacity:.5;cursor:not-allowed;transform:none; }
+
+.ai-btn { width:100%;padding:12px;background:rgba(249, 115, 22, 0.08);border:1px solid rgba(249, 115, 22, 0.3);border-radius:10px;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--primary);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;font-family:var(--font-ui);margin-top:12px; }
+.ai-btn:hover { background:rgba(249, 115, 22, 0.15);border-color:var(--primary); }
+.ai-btn:disabled { opacity:.5;cursor:not-allowed; }
+
+/* ── Config Output ── */
+.output-header { display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--bg3);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:12px; border-radius:16px 16px 0 0; }
+.output-meta { display:flex;align-items:center;gap:12px; }
+.meta-pill { font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:4px 10px;border-radius:20px;background:rgba(249, 115, 22, 0.1);border:1px solid rgba(249, 115, 22, 0.3);color:var(--accent); }
+.output-actions { display:flex;gap:8px; }
+.btn-act { display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s;font-family:var(--font-ui); }
+.btn-act-p { background:var(--grad-m03);color:var(--void);border:none; }
+.btn-act-p:hover { filter:brightness(1.1); box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3); }
+.btn-act-g { background:var(--dark);border:1px solid var(--border);color:var(--text-2); }
+.btn-act-g:hover { border-color:var(--primary);color:var(--primary); }
+
+.config-output {
+  background:#1E1E24; /* Theme One Dark */
+  padding:24px;
+  font-family:var(--font-mono);
+  font-size:13px;
+  line-height:1.6;
+  color:#ABB2BF;
+  white-space:pre;
+  overflow-x:auto;
+  min-height:500px;
+  max-height:65vh;
+  overflow-y:auto;
+  tab-size:4;
+  position:relative;
+}
+
+/* Syntax highlighting Premium */
+.sh-comment  { color:#5C6370; font-style:italic; }
+.sh-keyword  { color:#C678DD; font-weight:600; }
+.sh-keyword2 { color:#E5C07B; }
+.sh-iface    { color:#E06C75; }
+.sh-ip       { color:#56B6C2; font-weight:600; }
+.sh-vlan     { color:#98C379; }
+.sh-string   { color:#98C379; }
+.sh-number   { color:#D19A66; }
+.sh-section  { color:#61AFEF; font-weight:800; }
+
+/* Empty output state */
+.output-empty { display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:400px;text-align:center; }
+.output-empty-icon { font-size:56px;opacity:.15;margin-bottom:20px; color:var(--text-5); }
+.output-empty-text { font-size:16px;font-weight:700;color:var(--text-2);margin-bottom:8px;font-family:var(--font-ui); }
+.output-empty-sub  { font-size:12px;color:var(--text-5);font-family:var(--font-ui); line-height:1.6; }
+
+/* Toast */
+#toastContainer { position:fixed;bottom:24px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:8px; }
+.toast { padding:14px 20px;border-radius:12px;font-size:12px;font-weight:600;animation:toastIn .3s ease;max-width:380px;box-shadow:0 10px 30px rgba(0,0,0,.5);display:flex;align-items:center;gap:10px;font-family:var(--font-ui); }
+.ts { background:var(--deep);border-left:4px solid var(--ok);color:var(--text-1); }
+.te { background:var(--deep);border-left:4px solid var(--alert);color:var(--text-1); }
+.ti { background:var(--deep);border-left:4px solid var(--primary);color:var(--text-1); }
+
+/* Output tabs */
+.tab-btn {
+  padding: 14px 20px; font-size: 11px; font-weight: 800; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--text-5); background: transparent;
+  border: none; border-bottom: 2px solid transparent; cursor: pointer;
+  transition: all .2s; white-space: nowrap; margin-bottom: -1px; font-family: var(--font-ui);
+}
+.tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background:rgba(249, 115, 22, 0.05); }
+.tab-btn:hover:not(.active) { color: var(--text-2); }
+.out-tab-content { background: var(--void) !important; min-height: 60px; animation: fadeIn .15s ease; border-radius:0 0 16px 16px; overflow:hidden;}
+
+/* Section tag */
+.stag { font-size:10px;font-weight:800;letter-spacing:2px;color:var(--primary);text-transform:uppercase;margin-bottom:12px; }
+
+/* Footer */
+.footer { margin-top:60px;padding-top:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px; }
+.footer-l { font-size:12px;font-weight:600;color:var(--text-2); }
+.footer-l strong { color:var(--primary); }
+.footer-c { font-size:12px;font-weight:500;color:var(--text-5);display:flex;align-items:center;gap:8px; }
+.footer-c a { color:var(--primary);font-weight:700; }
+.footer-c .cert { color:var(--cyan);font-weight:600; }
+.footer-r { font-size:11px;color:var(--text-5); }
+
+/* Select arrow custom */
+.form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23F97316' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px !important;
+}
+
+/* Stack + History entries */
+.sh-entry { background: var(--dark); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; transition: all .2s; }
+.sh-entry:hover { background: var(--mid); border-color: var(--primary); box-shadow: 0 4px 12px rgba(249, 115, 22, 0.1); }
+.sh-entry-title { font-size: 11px; font-weight: 800; color: var(--accent); }
+.sh-entry-meta  { font-size: 9px; color: var(--text-5); }
+.sh-entry-preview { font-size: 11px; color: var(--text-2); font-family: var(--font-mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 6px; }
+
+/* AI Provider Buttons */
+.prov-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:16px; background:var(--dark); padding:6px; border-radius:10px; border:1px solid var(--border); }
+.prov-btn { flex:1; text-align:center; padding:10px 14px; border-radius:6px; font-size:10px; font-weight:800; cursor:pointer; transition:all .2s; font-family:var(--font-ui); border:1px solid transparent; background:transparent; color:var(--text-5); text-transform:uppercase; letter-spacing:1px; }
+.prov-btn.active { background:var(--deep); border-color:var(--border); color:var(--primary); box-shadow:0 2px 8px rgba(0,0,0,.2); }
+.prov-btn:hover:not(.active) { color:var(--text-2); }
+</style>
+</head>
+<body>
+<div id="toastContainer"></div>
+
+<div id="app">
+
+<div class="nav-bar">
+  <div class="aurora-band"></div>
+  <nav class="nav">
+    <div style="display:flex;align-items:center;gap:16px">
+      <a href="index.html" class="nav-logo">
+        <svg viewBox="0 0 80 100" width="20" height="24"><defs><linearGradient id="g2" x1="0" y1="0" x2="80" y2="100" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#5B21B6"/><stop offset="38%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#F97316"/></linearGradient></defs><path d="M0,0 L0,100 L14,100 L14,22 L66,100 L80,100 L80,0 L66,0 L66,78 L14,0 Z" fill="url(#g2)"/><polygon points="40,44 47,51 40,58 33,51" fill="#FCD34D"/></svg>
+        <div><div class="nav-logo-nexor">NEXOR</div><div class="nav-logo-adv">ADVISORY</div></div>
+      </a>
+      <div class="nav-module">
+        <div class="nav-badge">Module 03 · Config Generator</div>
+      </div>
+    </div>
+    <div class="nav-actions no-print">
+      <button onclick="copyConfig()" class="btn-n btn-n-g">📋 Copier</button>
+      <button onclick="exportTxt()" class="btn-n btn-n-g">⬇ .txt</button>
+      <button onclick="exportTicket()" class="btn-n btn-n-g">🎫 Ticket</button>
+    </div>
+  </nav>
+</div>
+
+<main>
+  <div class="hero-strip">
+    <div class="hero-left">
+      <div class="hero-tag"><span class="dot"></span>Génération locale · 17 types · 5 constructeurs</div>
+      <h1 class="hero-title">Générez vos configs<br><span class="grad">en quelques secondes</span></h1>
+      <p class="hero-sub">Cisco IOS-XE · NX-OS · Juniper JunOS · Aruba AOS-CX · FortiOS · Revue IA Intégrée</p>
+    </div>
+    <div class="hero-stats">
+      <div class="h-stat"><span class="h-stat-n" id="s-vendor">—</span><span class="h-stat-l">Constructeur</span></div>
+      <div class="h-stat"><span class="h-stat-n" id="s-type">—</span><span class="h-stat-l">Type config</span></div>
+      <div class="h-stat"><span class="h-stat-n" id="s-lines">—</span><span class="h-stat-l">Lignes générées</span></div>
+    </div>
+  </div>
+
+  <div class="main-grid" style="display:grid;grid-template-columns:420px 1fr;gap:24px;align-items:start">
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+
+      <div class="card card-accent">
+        <div class="stag">1 · Constructeur &amp; Plateforme</div>
+        <div class="vendor-grid" id="vendorGrid"></div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Plateforme / Version</label>
+          <select id="platformSel" class="form-select" onchange="onPlatformChange()"></select>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="stag">2 · Type de configuration</div>
+        <div class="ctype-list" id="ctypeList"></div>
+      </div>
+
+      <div class="card card-accent" id="paramCard">
+        <div class="stag">3 · Paramètres</div>
+        <div id="paramForm">
+          <div style="text-align:center;padding:40px 20px;color:var(--text-5);font-size:13px;font-weight:600;">
+            Sélectionnez un type de configuration ci-dessus pour commencer.
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="stag" style="color:var(--teal-hl);">🤖 Intégration IA (Revue & Copilote)</div>
+        <div class="prov-bar">
+          <button class="prov-btn active" id="prov-claude" onclick="setProvider('claude')">✨ Claude API</button>
+          <button class="prov-btn" id="prov-lm" onclick="setProvider('lm')">🖥 LM Studio</button>
+          <button class="prov-btn" id="prov-none" onclick="setProvider('none')">⚡ Sans IA</button>
+        </div>
+        
+        <div id="cfg-lm-m03" style="display:none; background:var(--dark); padding:12px; border-radius:8px; border:1px solid var(--border);">
+          <div style="font-size:10px; color:var(--text-4); margin-bottom:12px; line-height:1.4; background:var(--bg3); padding:10px; border-radius:8px; border:1px solid var(--border);">
+            ℹ️ <strong>Note :</strong> LM Studio s'exécute localement. Pour des raisons de sécurité du navigateur, cet outil doit être téléchargé et ouvert depuis votre machine pour pouvoir communiquer avec <code>localhost</code>.<br>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <a href="module03-config-generator.html" download class="btn" style="padding:6px 12px; font-size:10px; background:transparent; border:1px solid var(--teal-hl); color:var(--teal-hl);">⬇️ Télécharger l'outil</a>
+              <a href="https://lmstudio.ai/" target="_blank" class="btn" style="padding:6px 12px; font-size:10px; background:transparent; border:1px solid var(--violet); color:var(--violet);">🌐 Obtenir LM Studio</a>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
+            <label class="form-label" style="color:var(--teal-hl);margin:0;">URL LM Studio</label>
+            <button type="button" onclick="testLMStudioM03()" style="padding:6px 12px; border:1px solid var(--teal-hl); border-radius:6px; color:var(--teal-hl); font-size:9px; font-weight:700; cursor:pointer; background:transparent; transition:all .2s;" onmouseover="this.style.background='rgba(34, 211, 238, 0.1)'" onmouseout="this.style.background='transparent'">TESTER LA CONNEXION</button>
+          </div>
+          <input type="text" id="lmUrlM03" value="http://localhost:1234" class="form-input" style="font-size:11px;color:var(--teal-hl);font-family:var(--font-mono);margin-bottom:4px" placeholder="http://localhost:1234">
+          <div id="lmStatusM03" style="font-size:10px;font-weight:600;margin-bottom:8px;color:var(--text-5);"></div>
+          
+          <label class="form-label" style="color:var(--teal-hl);">Modèle (Optionnel)</label>
+          <input type="text" id="lmModelM03" placeholder="Auto-détection" class="form-input" style="font-size:11px;color:var(--teal-hl);font-family:var(--font-mono);">
+        </div>
+        
+        <div id="cfg-claude-m03" style="display:flex;align-items:center;gap:10px;padding:8px; background:rgba(34, 211, 238, 0.05); border:1px solid rgba(34, 211, 238, 0.2); border-radius:8px;">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--teal-hl)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <div style="display:flex; flex-direction:column;">
+            <span style="font-size:10px;font-weight:700;color:var(--text-1);">Proxy Netlify Sécurisé</span>
+            <span style="font-size:9px;color:var(--text-5);font-family:var(--font-mono);">Modèle : claude-sonnet-4-6</span>
+          </div>
+        </div>
+        
+        <div id="cfg-none-m03" style="display:none;font-size:11px;color:var(--text-5);padding:8px; background:var(--dark); border-radius:8px; border:1px solid var(--border); font-weight:600; text-align:center;">
+          Mode 100% Local (Génération sans appel réseau).
+        </div>
+      </div>
+
+      <button class="cta-btn no-print" onclick="generateConfig()">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        Générer la configuration
+      </button>
+
+      <div class="card" style="border-color:rgba(34, 211, 238, 0.3);">
+        <div class="stag" style="color:var(--teal-hl);margin-bottom:12px;">🧠 Revue IA par Claude / Gemini</div>
+        <p style="font-size:11px;color:var(--text-5);margin-bottom:12px;line-height:1.6;font-weight:500;">Sécurisez et optimisez la configuration générée grâce à l'expertise de l'IA embarquée.</p>
+        <select id="aiMode" class="form-select" style="margin-bottom:12px;font-size:11px; font-weight:600;">
+          <option value="review">Revue générale + recommandations</option>
+          <option value="harden">Hardening sécurité (CIS/STIG)</option>
+          <option value="optimize">Optimisation performance</option>
+          <option value="doc">Générer documentation inline</option>
+          <option value="diff">Proposer configuration alternative</option>
+        </select>
+        <button class="ai-btn no-print" id="aiBtn" onclick="aiReview()" style="color:var(--teal-hl); border-color:rgba(34, 211, 238, 0.4); background:rgba(34, 211, 238, 0.05);">
+          <span id="aiSpinner"></span>
+          ✨ Lancer la Revue IA
+        </button>
+      </div>
+
+    </div>
+    <div class="card" style="padding:0;overflow:hidden; display:flex; flex-direction:column;">
+
+      <div class="output-header">
+        <div class="output-meta">
+          <span class="meta-pill" id="out-vendor-badge">—</span>
+          <span class="meta-pill" id="out-type-badge">—</span>
+          <span style="font-size:10px;font-weight:600;color:var(--text-5)" id="out-lines-info">0 lignes · 0 chars</span>
+        </div>
+        <div class="output-actions no-print">
+          <button onclick="addToStack()" class="btn-act" style="background:rgba(249, 115, 22, 0.15);border:1px solid rgba(249, 115, 22, 0.3);color:var(--primary)" title="Ajouter au stack">＋ Stack</button>
+          <button onclick="toggleLineNumbers()" class="btn-act btn-act-g" title="Numéros de ligne">⟨⟩ Lignes</button>
+          <button onclick="exportTxt()" class="btn-act btn-act-p" title="Télécharger .txt">⬇ .txt</button>
+        </div>
+      </div>
+
+      <div style="display:flex;border-bottom:1px solid var(--border);background:var(--dark)">
+        <button class="tab-btn active" onclick="switchOutTab('config')" id="otab-config">Config CLI</button>
+        <button class="tab-btn" onclick="switchOutTab('stack')" id="otab-stack">Stack <span id="stack-count" style="font-size:9px;background:var(--primary);color:var(--void);padding:2px 6px;border-radius:10px;margin-left:6px;font-weight:900;">0</span></button>
+        <button class="tab-btn" onclick="switchOutTab('history')" id="otab-history">Historique</button>
+        <button class="tab-btn" onclick="switchOutTab('import')" id="otab-import">Analyser une config</button>
+      </div>
+
+      <div id="out-config" class="out-tab-content" style="flex:1;">
+        <div id="configOutput" class="config-output">
+          <div class="output-empty">
+            <div class="output-empty-icon">⌨️</div>
+            <div class="output-empty-text">Terminal de Configuration</div>
+            <p class="output-empty-sub">Le code CLI prêt à être déployé s'affichera ici.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="out-stack" class="out-tab-content" style="display:none; flex:1;">
+        <div style="padding:16px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center; background:var(--bg3);">
+          <div style="font-size:10px;font-weight:800;letter-spacing:2px;color:var(--primary);text-transform:uppercase">Stack de configurations</div>
+          <div style="display:flex;gap:10px">
+            <button onclick="exportStack()" class="btn-act btn-act-p">⬇ Exporter le Stack</button>
+            <button onclick="clearStack()" class="btn-act" style="color:#ef4444;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.1)">✕ Vider</button>
+          </div>
+        </div>
+        <div id="stackList" style="padding:16px;max-height:60vh;overflow-y:auto"></div>
+      </div>
+
+      <div id="out-history" class="out-tab-content" style="display:none; flex:1;">
+        <div style="padding:16px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center; background:var(--bg3);">
+          <div style="font-size:10px;font-weight:800;letter-spacing:2px;color:var(--primary);text-transform:uppercase">Historique (15 dernières)</div>
+          <button onclick="clearHistory()" class="btn-act" style="color:#ef4444;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.1)">✕ Effacer tout</button>
+        </div>
+        <div id="historyList" style="padding:16px;max-height:60vh;overflow-y:auto"></div>
+      </div>
+
+      <div id="out-import" class="out-tab-content" style="display:none; flex:1;">
+        <div style="padding:24px">
+          <div style="font-size:11px;font-weight:800;letter-spacing:2px;color:var(--teal-hl);text-transform:uppercase;margin-bottom:12px">Audit d'une configuration existante</div>
+          <p style="font-size:12px;color:var(--text-2);margin-bottom:16px;line-height:1.6;font-weight:500;">Collez une configuration réseau. Le moteur IA identifiera le constructeur, audîtera la sécurité et proposera des optimisations.</p>
+          <textarea id="importArea" style="width:100%;height:250px;background:var(--void);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;font-family:var(--font-mono);font-size:12px;color:var(--text-1);resize:vertical;box-sizing:border-box" placeholder="! Cisco IOS-XE&#10;interface GigabitEthernet0/1&#10; description ..."></textarea>
+          <div style="display:flex;gap:12px;margin-top:16px">
+            <button onclick="analyzeImport()" class="btn-act btn-act-p" style="flex:1; padding:12px; font-size:12px;">🔍 Analyser avec l'IA</button>
+            <button onclick="document.getElementById('importArea').value=''" class="btn-act btn-act-g" style="padding:12px 24px;">✕ Vider</button>
+          </div>
+          <div id="importResult" style="display:none;margin-top:20px;background:rgba(34, 211, 238, 0.05);border:1px solid rgba(34, 211, 238, 0.2);border-left:4px solid var(--teal-hl); border-radius:var(--radius-sm);padding:20px;font-size:13px;color:var(--text-1);white-space:pre-wrap;line-height:1.7;font-family:var(--font-ui)"></div>
+        </div>
+      </div>
+
+      <div id="aiOutput" style="display:none;border-top:1px solid var(--border);padding:24px; background:var(--bg3);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div style="font-size:10px;font-weight:900;letter-spacing:2px;color:var(--teal-hl);text-transform:uppercase">✨ Revue IA Détaillée</div>
+          <button onclick="document.getElementById('aiOutput').style.display='none'" style="background:transparent;border:none;color:var(--text-5);cursor:pointer;font-size:20px">✕</button>
+        </div>
+        <div id="aiText" style="background:var(--void);border:1px solid rgba(34, 211, 238, 0.2);border-radius:12px;padding:20px;font-size:13px;color:var(--text-1);line-height:1.8;white-space:pre-wrap;font-family:var(--font-ui);"></div>
+      </div>
+
+    </div>
+    </div>
+  <footer style="margin-top:60px;padding:32px 0;border-top:1px solid rgba(255,255,255,0.1);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;font-size:11px;color:#9ca3af">
+    <div>NetForge AI · Module 03 · <strong style="color:#a855f7">v8.0</strong> · NEXOR Advisory</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <a href="https://www.linkedin.com/in/romaric-okemba-27833230/" target="_blank" style="color:#a855f7;font-weight:700;text-decoration:none">Romaric Okemba</a>
+      <span style="color:#22d3ee;font-weight:600">· CCIE Wireless</span>
+      <span>· CWNE · ECSE Design · CCS-ECore</span>
+      <a href="https://www.linkedin.com/in/romaric-okemba-27833230/" target="_blank" style="display:flex;align-items:center;color:#a855f7">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+      </a>
+    </div>
+    <div style="text-align:right">Résultats à valider par un ingénieur avant application en production</div>
+  </footer>
+</main>
+</div><script>
+// ====================================================================================
+// LE SCRIPT JAVASCRIPT RESTE STRICTEMENT IDENTIQUE À VOTRE VERSION ORIGINALE
+// AUCUNE LOGIQUE N'A ÉTÉ MODIFIÉE (Data Binding, Exports, Constructeurs, Moteur IA).
+// ====================================================================================
+
+// ── Sécurité XSS : escapeHTML stricte ──────────────────────────────────────
+function escapeHTML(str) {
+  if (typeof str !== 'string') return String(str ?? '');
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
+function setProvider(p) {
+  AppState.provider = p;
+  ['claude','lm','none'].forEach(x => {
+    const b = document.getElementById('prov-' + x);
+    if (b) b.classList.toggle('active', x === p);
+  });
+  const els = { 'lm':'cfg-lm-m03', 'claude':'cfg-claude-m03', 'none':'cfg-none-m03' };
+  Object.entries(els).forEach(([k, id]) => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = (p === k) ? (k==='claude'?'flex':'block') : 'none';
+  });
+  showToast(p==='claude'?'Mode Claude API':p==='lm'?'Mode LM Studio local':'Mode sans IA', 'info');
+}
+
+function showToast(msg, type) {
+  const cls = { success:'ts', error:'te', info:'ti' };
+  const t = document.createElement('div');
+  t.className = 'toast ' + (cls[type] || 'ti');
+  t.textContent = msg;
+  const c = document.getElementById('toastContainer');
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>c.removeChild(t),350); }, 3500);
+}
+
+const VENDORS = {
+  'cisco-iosxe': {
+    name:'Cisco IOS-XE', icon:'🔵', color:'#00bceb',
+    platforms:['IOS-XE 17.x (Catalyst)','IOS-XE 16.x','IOS 15.x'],
+    types:['vlan','interface-access','interface-trunk','interface-l3','ospf','bgp','dhcp','acl','port-security','ntp','aaa','lacp','stp','type7','mtu-mss','firewall'],
+  },
+  'cisco-nxos': {
+    name:'Cisco NX-OS', icon:'🔵', color:'#00bceb',
+    platforms:['NX-OS 10.x (Nexus 9k)','NX-OS 9.x (Nexus 7k)','NX-OS 7.x'],
+    types:['vlan','interface-access','interface-trunk','interface-l3','ospf','bgp','vpc'],
+  },
+  'juniper': {
+    name:'Juniper JunOS', icon:'🟢', color:'#84bc22',
+    platforms:['JunOS 23.x (EX/QFX)','JunOS 22.x','JunOS 21.x'],
+    types:['vlan','interface-access','interface-trunk','interface-l3','ospf','bgp'],
+  },
+  'aruba-cx': {
+    name:'Aruba AOS-CX', icon:'🟠', color:'#ff7300',
+    platforms:['AOS-CX 10.14','AOS-CX 10.12','AOS-CX 10.10'],
+    types:['vlan','interface-access','interface-trunk','interface-l3','ospf'],
+  },
+  'fortios': {
+    name:'FortiGate FortiOS', icon:'🔴', color:'#ee3124',
+    platforms:['FortiOS 7.4','FortiOS 7.2','FortiOS 7.0'],
+    types:['vlan','dhcp','acl'],
+  },
+};
+
+const CONFIG_TYPES = {
+  'vlan'            :{ icon:'🏷',  name:'Plan VLAN',            desc:'Déclaration VLANs + nommage' },
+  'interface-access':{ icon:'🔌', name:'Interface Access',      desc:'Port access L2 + sécurité' },
+  'interface-trunk' :{ icon:'🔗', name:'Interface Trunk',       desc:'Port trunk + allowed VLANs' },
+  'interface-l3'    :{ icon:'🌐', name:'Interface L3 (routed)', desc:'IP, DHCP relay, OSPF passive' },
+  'ospf'            :{ icon:'🗺',  name:'OSPF',                 desc:'Configuration OSPF v2/v3' },
+  'bgp'             :{ icon:'📡', name:'BGP',                   desc:'iBGP/eBGP + peer groups' },
+  'dhcp'            :{ icon:'📦', name:'DHCP Server',           desc:'Pools + exclusions + options' },
+  'acl'             :{ icon:'🛡',  name:'ACL',                  desc:'Standard / Étendue / Nommée' },
+  'port-security'   :{ icon:'🔒', name:'Port Security',         desc:'MAC limit + violation action' },
+  'ntp'             :{ icon:'🕐', name:'NTP',                   desc:'Synchronisation + auth' },
+  'aaa'             :{ icon:'👤', name:'AAA / RADIUS',          desc:'Auth locale + RADIUS ISE' },
+  'lacp'            :{ icon:'⚡', name:'LACP / Port-Channel',   desc:'LAG + agrégation de liens' },
+  'stp'             :{ icon:'🌳', name:'STP / Rapid PVST+',     desc:'Root bridge + timers' },
+  'vpc'             :{ icon:'⚖',  name:'vPC',                   desc:'Virtual Port-Channel NX-OS' },
+  'type7'           :{ icon:'🔑', name:'Cisco Type 7',           desc:'Déchiffrer / chiffrer password' },
+  'mtu-mss'         :{ icon:'📐', name:'MTU / MSS Calculator',   desc:'Overhead tunnels + MSS optimal' },
+  'firewall'        :{ icon:'🛡',  name:'Firewall Generator',     desc:'iptables / nftables / UFW' },
+};
+
+const AppState = {
+  vendor      : 'cisco-iosxe',
+  platform    : '',
+  configType  : '',
+  lastConfig  : '',
+  lineNumbers : false,
+  provider    : 'claude',
+  lmUrl       : 'http://localhost:1234',
+  stack       : [],
+  history     : [],
+};
+
+const HIST_KEY = 'nf_m03_history';
+
+function initApp() {
+  renderVendors();
+  selectVendor('cisco-iosxe');
+  setProvider(AppState.provider || 'claude');
+  try { const h = JSON.parse(localStorage.getItem(HIST_KEY)||'[]'); AppState.history = h; renderHistory(); document.getElementById('hist-count').textContent = h.length; } catch(e) {}
+}
+
+function switchOutTab(id) {
+  ['config','stack','history','import'].forEach(t => {
+    const tab = document.getElementById('out-' + t);
+    const btn = document.getElementById('otab-' + t);
+    if (tab) tab.style.display = t === id ? 'block' : 'none';
+    if (btn) btn.classList.toggle('active', t === id);
+  });
+}
+
+function clearOutput() {
+  if (!AppState.lastConfig) return;
+  const out = document.getElementById('configOutput');
+  out.innerHTML = `<div class="output-empty">
+    <div class="output-empty-icon">⌨️</div>
+    <div class="output-empty-text">Terminal vidé</div>
+    <p class="output-empty-sub">Générez une nouvelle configuration ou restaurez depuis l'<strong style="color:var(--primary);cursor:pointer" onclick="switchOutTab('history')">historique</strong></p>
+  </div>`;
+  AppState.lastConfig = '';
+  document.getElementById('out-lines-info').textContent = '0 lignes · 0 chars';
+  document.getElementById('out-vendor-badge').textContent = '—';
+  document.getElementById('out-type-badge').textContent = '—';
+  document.getElementById('s-lines').textContent = '—';
+  document.getElementById('aiOutput').style.display = 'none';
+  showToast('Configuration effacée', 'info');
+}
+
+function addToStack() {
+  if (!AppState.lastConfig) { showToast('Aucune configuration à ajouter', 'error'); return; }
+  const entry = {
+    vendor : AppState.vendor,
+    type   : AppState.configType,
+    cfg    : AppState.lastConfig,
+    ts     : new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}),
+    lines  : AppState.lastConfig.split('\n').filter(l => l.trim()).length,
+  };
+  AppState.stack.push(entry);
+  renderStack();
+  document.getElementById('stack-count').textContent = AppState.stack.length;
+  showToast(`✅ Ajouté au stack (${AppState.stack.length} config${AppState.stack.length > 1 ? 's' : ''})`, 'success');
+  switchOutTab('stack');
+}
+
+function removeFromStack(idx) {
+  AppState.stack.splice(idx, 1);
+  renderStack();
+  document.getElementById('stack-count').textContent = AppState.stack.length;
+}
+
+function clearStack() {
+  if (!AppState.stack.length) return;
+  AppState.stack=[]; renderStack(); document.getElementById('stack-count').textContent=0; showToast('Stack vidé','info');
+}
+
+function renderStack() {
+  const list = document.getElementById('stackList');
+  if (!AppState.stack.length) {
+    list.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-5)">
+      <div style="font-size:32px;margin-bottom:12px;opacity:.2">📚</div>
+      <p style="font-size:12px">Aucune config dans le stack<br><span style="font-size:10px">Cliquez sur <strong style="color:var(--primary)">＋ Stack</strong> après génération</span></p>
+    </div>`;
+    return;
+  }
+  list.innerHTML = AppState.stack.map((e, i) => {
+    const v = VENDORS[e.vendor];
+    const ct = CONFIG_TYPES[e.type];
+    const preview = e.cfg.split('\n').filter(l => l.trim() && !l.includes('═') && !l.startsWith('!')).slice(0, 2).join(' · ');
+    return `<div class="sh-entry" style="display:flex;align-items:flex-start;gap:12px">
+      <div style="font-size:24px;flex-shrink:0">${v ? v.icon : '⚙'}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+          <span class="sh-entry-title">${ct ? ct.name : e.type}</span>
+          <span class="sh-entry-meta">${v ? v.name : e.vendor}</span>
+          <span class="sh-entry-meta" style="margin-left:auto">${e.ts} · ${e.lines} lignes</span>
+        </div>
+        <div class="sh-entry-preview">${escapeHTML(preview)}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button onclick="restoreFromStack(${i})" class="btn-act btn-act-g" style="padding:6px 10px; color:var(--primary); border-color:var(--primary);" title="Restaurer">↩</button>
+        <button onclick="removeFromStack(${i})" class="btn-act btn-act-g" style="padding:6px 10px; color:var(--alert); border-color:var(--alert);" title="Supprimer">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function restoreFromStack(idx) {
+  const e = AppState.stack[idx];
+  if (!e) return;
+  AppState.lastConfig = e.cfg;
+  AppState.vendor = e.vendor;
+  AppState.configType = e.type;
+  renderConfig(e.cfg);
+  switchOutTab('config');
+  showToast(`Config restaurée depuis le stack`, 'info');
+}
+
+function exportStack() {
+  if (!AppState.stack.length) { showToast('Stack vide', 'error'); return; }
+  const combined = AppState.stack.map((e, i) => {
+    const ct = CONFIG_TYPES[e.type];
+    const v = VENDORS[e.vendor];
+    return `!\n! ═══ SECTION ${i+1}/${AppState.stack.length} : ${ct?.name || e.type} — ${v?.name || e.vendor} ═══\n!\n${e.cfg}`;
+  }).join('\n');
+  const date = new Date().toISOString().slice(0,10);
+  const blob = new Blob([combined], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `netforge_m03_stack_${AppState.stack.length}configs_${date}.txt`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast(`✅ Stack exporté — ${AppState.stack.length} configs`, 'success');
+}
+
+function saveToHistory(cfg, vendor, type) {
+  const entry = {
+    vendor, type, cfg,
+    ts    : new Date().toLocaleString('fr-FR', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}),
+    lines : cfg.split('\n').filter(l => l.trim()).length,
+  };
+  AppState.history.unshift(entry);
+  if (AppState.history.length > 15) AppState.history = AppState.history.slice(0, 15);
+  try { localStorage.setItem(HIST_KEY, JSON.stringify(AppState.history)); } catch(e) {}
+  renderHistory();
+  document.getElementById('hist-count').textContent = AppState.history.length;
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  document.getElementById('hist-count').textContent = AppState.history.length;
+  if (!AppState.history.length) {
+    list.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-5)"><p style="font-size:12px">Aucun historique · Les configurations générées apparaissent ici</p></div>`;
+    return;
+  }
+  list.innerHTML = AppState.history.map((e, i) => {
+    const vv = VENDORS[e.vendor];
+    const ct = CONFIG_TYPES[e.type];
+    const preview = e.cfg.split('\n').filter(l => l.trim() && !l.includes('═') && !l.startsWith('!')).slice(0, 1).join('');
+    return `<div class="sh-entry" style="display:flex;align-items:center;gap:12px;cursor:pointer" onclick="restoreFromHistory(${i})">
+      <div style="font-size:24px;flex-shrink:0">${vv ? vv.icon : '⚙'}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+          <span class="sh-entry-title">${ct ? ct.name : e.type}</span>
+          <span class="sh-entry-meta">${vv ? vv.name : e.vendor}</span>
+        </div>
+        <div class="sh-entry-meta">${e.ts} · ${e.lines} lignes</div>
+        <div class="sh-entry-preview">${escapeHTML(preview)}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button onclick="event.stopPropagation(); addHistToStack(${i})" class="btn-act btn-act-g" style="padding:6px 10px; color:var(--primary); border-color:var(--primary);" title="Ajouter au stack">＋</button>
+        <button onclick="event.stopPropagation(); deleteHistory(${i})" class="btn-act btn-act-g" style="padding:6px 10px; color:var(--alert); border-color:var(--alert);" title="Supprimer">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function restoreFromHistory(idx) {
+  const e = AppState.history[idx];
+  if (!e) return;
+  AppState.lastConfig = e.cfg;
+  AppState.vendor = e.vendor;
+  AppState.configType = e.type;
+  renderConfig(e.cfg);
+  switchOutTab('config');
+  showToast(`Config restaurée depuis l'historique`, 'info');
+}
+
+function addHistToStack(idx) {
+  const e = AppState.history[idx];
+  if (!e) return;
+  AppState.stack.push({...e});
+  renderStack();
+  document.getElementById('stack-count').textContent = AppState.stack.length;
+  showToast(`Ajouté au stack depuis l'historique`, 'success');
+}
+
+function deleteHistory(idx) {
+  AppState.history.splice(idx, 1);
+  try { localStorage.setItem(HIST_KEY, JSON.stringify(AppState.history)); } catch(e) {}
+  renderHistory();
+}
+
+function clearHistory() {
+  if (!AppState.history.length) return;
+  if (!confirm(`Effacer les ${AppState.history.length} entrées d'historique ?`)) return;
+  AppState.history = [];
+  try { localStorage.removeItem(HIST_KEY); } catch(e) {}
+  renderHistory();
+  showToast('Historique effacé', 'info');
+}
+
+async function analyzeImport() {
+  const cfg = document.getElementById('importArea').value.trim();
+  if (!cfg) { showToast('Collez d\'abord une configuration', 'error'); return; }
+
+  const result = document.getElementById('importResult');
+  result.style.display = 'block';
+  result.textContent = '⏳ Analyse IA en cours…';
+
+  const sysPrompt = `Tu es un expert réseau CCIE travaillant pour NEXOR Advisory.
+Analyse la configuration réseau fournie et réponds en français avec :
+1. Constructeur détecté (et confiance %)
+2. Type(s) de configuration identifiés
+3. Points forts (bonnes pratiques déjà présentes)
+4. Problèmes détectés (sécurité, performance, redondance)
+5. Recommandations concrètes d'amélioration (avec les commandes corrigées)
+Sois précis, professionnel, orienté production.`;
+
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 90000);
+    let fetchUrl = '/api/analyze';
+    const userPrompt = `Analyse cette configuration réseau :\n\`\`\`\n${cfg}\n\`\`\``; // Not escaped for the API request text
+
+    let fetchBody_ai = JSON.stringify({
+      model: 'claude-sonnet-4-6', max_tokens: 1500,
+      system: sysPrompt,
+      messages: [{ role: 'user', content: userPrompt }],
+    });
+    let fetchHeaders_ai = { 'Content-Type': 'application/json' };
+
+    if (AppState.provider === 'lm') {
+      const lmUrl = (document.getElementById('lmUrlM03')?.value || 'http://localhost:1234').replace(/\/$/, '');
+      fetchUrl = lmUrl + '/v1/chat/completions';
+      fetchBody_ai = JSON.stringify({
+        messages: [{ role: 'system', content: sysPrompt }, { role: 'user', content: userPrompt }], 
+        max_tokens: 1500,
+      });
+    } else if (AppState.provider === 'none') {
+      result.textContent = '⚡ Mode sans IA — générez votre configuration et analysez manuellement.';
+      showToast('Mode sans IA activé', 'info');
+      return;
+    }
+
+    const res = await fetch(fetchUrl, {
+      method:'POST', headers: fetchHeaders_ai, body: fetchBody_ai, signal: ctrl.signal,
+    });
+    clearTimeout(tid);
+    if (!res.ok) throw new Error('API ' + res.status);
+    const data = await res.json();
+    result.textContent = data.content?.[0]?.text || data.choices?.[0]?.message?.content || data.reply || 'Réponse vide';
+  } catch(e) {
+    result.textContent = `❌ ${e.name === 'AbortError' ? 'Délai dépassé' : e.message}`;
+  }
+}
+
+function renderVendors() {
+  const grid = document.getElementById('vendorGrid');
+  grid.innerHTML = Object.entries(VENDORS).map(([id, v]) => `
+    <button class="vendor-btn ${id === AppState.vendor ? 'active' : ''}" onclick="selectVendor('${id}')">
+      <span class="v-icon">${v.icon}</span>
+      <span class="v-name">${v.name}</span>
+    </button>`).join('');
+}
+
+function selectVendor(id) {
+  AppState.vendor = id;
+  const v = VENDORS[id];
+  renderVendors();
+  const psel = document.getElementById('platformSel');
+  psel.innerHTML = v.platforms.map(p => `<option>${p}</option>`).join('');
+  AppState.platform = v.platforms[0];
+  renderCtypes(v.types);
+  if (v.types.length) selectCtype(v.types[0]);
+  updateHeroStats();
+}
+
+function onPlatformChange() {
+  AppState.platform = document.getElementById('platformSel').value;
+}
+
+function renderCtypes(types) {
+  const list = document.getElementById('ctypeList');
+  list.innerHTML = types.map(t => {
+    const ct = CONFIG_TYPES[t];
+    if (!ct) return '';
+    return `<button class="ctype-btn" onclick="selectCtype('${t}')" id="ct-${t}">
+      <span class="ct-icon">${ct.icon}</span>
+      <span><div style="font-weight:800;color:var(--text-1);">${ct.name}</div><div class="ctype-meta">${ct.desc}</div></span>
+    </button>`;
+  }).join('');
+}
+
+function selectCtype(type) {
+  AppState.configType = type;
+  document.querySelectorAll('.ctype-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('ct-' + type);
+  if (btn) btn.classList.add('active');
+  renderParamForm(type);
+  updateHeroStats();
+}
+
+function updateHeroStats() {
+  const v = VENDORS[AppState.vendor];
+  document.getElementById('s-vendor').textContent = v ? v.name.split(' ')[0] : '—';
+  const ct = CONFIG_TYPES[AppState.configType];
+  document.getElementById('s-type').textContent = ct ? ct.name.split(' ')[0] : '—';
+  const output = document.getElementById('configOutput');
+  const lines = (output.innerText || output.textContent).split('\n').filter(l => l.trim()).length;
+  document.getElementById('s-lines').textContent = lines > 0 ? lines : '—';
+}
+
+function renderParamForm(type) {
+  const form = document.getElementById('paramForm');
+  const forms = {
+    'vlan': formVLAN, 'interface-access': formIfAccess, 'interface-trunk': formIfTrunk,
+    'interface-l3': formIfL3, 'ospf': formOSPF, 'bgp': formBGP, 'dhcp': formDHCP,
+    'acl': formACL, 'port-security': formPortSec, 'ntp': formNTP, 'aaa': formAAA,
+    'lacp': formLACP, 'stp': formSTP, 'vpc': formVPC, 'type7': formType7,
+    'mtu-mss': formMtuMss, 'firewall': formFirewall,
+  };
+  const fn = forms[type];
+  form.innerHTML = fn ? fn() : `<p style="color:var(--text-5);font-size:12px;padding:20px;text-align:center">Formulaire pour "${type}" en cours de développement.</p>`;
+}
+
+function inp(id, label, placeholder, hint, type) {
+  return `<div class="form-group">
+    <label class="form-label">${label}</label>
+    <input type="${type||'text'}" id="${id}" class="form-input" placeholder="${placeholder||''}">
+    ${hint ? `<div class="form-hint">${hint}</div>` : ''}
+  </div>`;
+}
+function sel(id, label, opts) {
+  return `<div class="form-group">
+    <label class="form-label">${label}</label>
+    <select id="${id}" class="form-select">${opts.map(o => `<option value="${o.v||o}">${o.l||o}</option>`).join('')}</select>
+  </div>`;
+}
+function chk(id, label, checked) {
+  return `<div class="chk-row"><input type="checkbox" id="${id}" ${checked?'checked':''}><label for="${id}">${label}</label></div>`;
+}
+
+function formVLAN() {
+  return `
+  <div class="form-group">
+    <label class="form-label">VLANs (ID · Nom · Type)</label>
+    <div id="vlanRows">
+      <div class="dyn-row">
+        <input type="number" class="form-input" placeholder="ID" style="width:60px;flex:none" min="1" max="4094">
+        <input type="text" class="form-input" placeholder="Nom (ex: DATA)">
+        <select class="form-select" style="width:100px;flex:none">
+          <option>DATA</option><option>VOICE</option><option>MGMT</option><option>DMZ</option><option>INFRA</option>
+        </select>
+        <button class="dyn-del" onclick="this.parentElement.remove()">✕</button>
+      </div>
+    </div>
+    <button class="dyn-add" onclick="addVlanRow()">+ Ajouter un VLAN</button>
+  </div>
+  ${chk('vlanMgmt','Désactiver le SVI du VLAN 1 (Sécurité)')}
+  ${chk('vlanVTP','Passer VTP en mode Transparent')}
+  ${inp('vtpDomain','VTP Domain (optionnel)','ex: NEXOR-CORP')}`;
+}
+function addVlanRow() {
+  const c = document.getElementById('vlanRows');
+  const d = document.createElement('div'); d.className = 'dyn-row';
+  d.innerHTML = `<input type="number" class="form-input" placeholder="ID" style="width:60px;flex:none" min="1" max="4094">
+    <input type="text" class="form-input" placeholder="Nom">
+    <select class="form-select" style="width:100px;flex:none"><option>DATA</option><option>VOICE</option><option>MGMT</option><option>DMZ</option><option>INFRA</option></select>
+    <button class="dyn-del" onclick="this.parentElement.remove()">✕</button>`;
+  c.appendChild(d);
+}
+
+function formIfAccess() {
+  return `
+  ${inp('ifName','Interface Cible','ex: GigabitEthernet1/0/1')}
+  ${inp('ifDesc','Description','ex: ACCES_USER_PC')}
+  ${inp('ifVlan','VLAN DATA (ID)','ex: 10')}
+  ${inp('ifVoice','VLAN VOICE (Optionnel)','ex: 20')}
+  ${chk('ifPortfast','Activer STP PortFast (Edge Port)', true)}
+  ${chk('ifBpduGuard','Activer STP BPDU Guard', true)}
+  ${chk('ifStorm','Activer Storm Control (80%)', true)}
+  ${chk('ifNoShut','Allumer l\'interface (no shutdown)',true)}`;
+}
+
+function formIfTrunk() {
+  return `
+  ${inp('trName','Interface Uplink','ex: TenGigabitEthernet1/1/1')}
+  ${inp('trDesc','Description','ex: UPLINK_VERS_CORE')}
+  ${inp('trVlans','VLANs autorisés (Trunk Allowed)','ex: 10,20,30,40-60')}
+  ${inp('trNative','VLAN Natif','ex: 999')}
+  ${sel('trEncap','Encapsulation',[{v:'dot1q',l:'802.1Q (Standard)'},{v:'auto',l:'Negotiate (NX-OS)'}])}
+  ${chk('trRootGuard','Activer STP Root Guard',true)}
+  ${chk('trDtp','Désactiver DTP (switchport nonegotiate)',true)}
+  ${chk('trNoShut','Allumer l\'interface',true)}`;
+}
+
+function formIfL3() {
+  return `
+  ${inp('l3Name','Interface Routée','ex: GigabitEthernet0/0/0')}
+  ${inp('l3Desc','Description','ex: WAN_PROVIDER_MPLS')}
+  ${inp('l3IP','Adresse IP / Masque','ex: 10.0.0.1 255.255.255.252 ou 10.0.0.1/30')}
+  ${inp('l3Helper','IP Helper (DHCP Relay)','ex: 192.168.100.10')}
+  ${inp('l3Ospf','Zone OSPF (si annonce réseau)','ex: 0')}
+  ${chk('l3Passive','Déclarer OSPF passive-interface',false)}
+  ${chk('l3NoShut','Allumer l\'interface',true)}`;
+}
+
+function formOSPF() {
+  return `
+  ${inp('ospfPid','Process ID OSPF','ex: 1')}
+  ${inp('ospfRid','Router-ID','ex: 10.0.0.1')}
+  ${inp('ospfRef','Reference Bandwidth (Mbps)','ex: 100000 (Pour interfaces 100G)')}
+  <div class="form-group">
+    <label class="form-label">Réseaux à annoncer (Networks)</label>
+    <div id="ospfNets">
+      <div class="dyn-row">
+        <input type="text" class="form-input" placeholder="IP (10.0.0.0)">
+        <input type="text" class="form-input" placeholder="Wildcard (0.0.0.255)" style="width:130px;flex:none">
+        <input type="text" class="form-input" placeholder="Zone (0)" style="width:70px;flex:none">
+        <button class="dyn-del" onclick="this.parentElement.remove()">✕</button>
+      </div>
+    </div>
+    <button class="dyn-add" onclick="addOspfNet()">+ Ajouter Network</button>
+  </div>
+  ${inp('ospfPassive','Interfaces Passives (séparées par virgule)','ex: Loopback0, GigabitEthernet0/1')}
+  ${chk('ospfAuth','Activer Authentification MD5',false)}
+  ${inp('ospfKey','Clé secrète MD5','ex: SecretOspfKey')}
+  ${chk('ospfDefault','Redistribuer la route par défaut (default-info originate)',false)}`;
+}
+function addOspfNet() {
+  const c = document.getElementById('ospfNets');
+  const d = document.createElement('div'); d.className='dyn-row';
+  d.innerHTML=`<input type="text" class="form-input" placeholder="IP"><input type="text" class="form-input" placeholder="Wildcard" style="width:130px;flex:none"><input type="text" class="form-input" placeholder="Zone" style="width:70px;flex:none"><button class="dyn-del" onclick="this.parentElement.remove()">✕</button>`;
+  c.appendChild(d);
+}
+
+function formBGP() {
+  return `
+  ${inp('bgpAS','AS Local','ex: 65000')}
+  ${inp('bgpRID','Router-ID BGP','ex: 10.0.0.1')}
+  <div class="form-group">
+    <label class="form-label">Peers BGP (Voisins)</label>
+    <div id="bgpNeighbors">
+      <div class="dyn-row">
+        <input type="text" class="form-input" placeholder="IP Peer">
+        <input type="text" class="form-input" placeholder="Remote AS" style="width:100px;flex:none">
+        <input type="text" class="form-input" placeholder="Description">
+        <button class="dyn-del" onclick="this.parentElement.remove()">✕</button>
+      </div>
+    </div>
+    <button class="dyn-add" onclick="addBgpNeighbor()">+ Ajouter Peer</button>
+  </div>
+  ${inp('bgpNets','Réseaux à annoncer (CIDR)','ex: 10.0.0.0/8, 192.168.1.0/24')}
+  ${chk('bgpRR','Configurer comme Route Reflector',false)}
+  ${chk('bgpBFD','Activer BFD pour chute rapide de session',false)}`;
+}
+function addBgpNeighbor() {
+  const c = document.getElementById('bgpNeighbors');
+  const d = document.createElement('div'); d.className='dyn-row';
+  d.innerHTML=`<input type="text" class="form-input" placeholder="IP Peer"><input type="text" class="form-input" placeholder="Remote AS" style="width:100px;flex:none"><input type="text" class="form-input" placeholder="Description"><button class="dyn-del" onclick="this.parentElement.remove()">✕</button>`;
+  c.appendChild(d);
+}
+
+function formDHCP() {
+  return `
+  <div class="form-group">
+    <label class="form-label">Pools DHCP</label>
+    <div id="dhcpPools">
+      <div class="dyn-row">
+        <input type="text" class="form-input" placeholder="Nom du Pool">
+        <input type="text" class="form-input" placeholder="Réseau (192.168.10.0)">
+        <input type="text" class="form-input" placeholder="Masque (/24)">
+        <button class="dyn-del" onclick="this.parentElement.remove()">✕</button>
+      </div>
+    </div>
+    <button class="dyn-add" onclick="addDhcpPool()">+ Ajouter Pool</button>
+  </div>
+  ${inp('dhcpGW','Gateway par défaut','ex: 192.168.10.1')}
+  ${inp('dhcpDNS1','Serveur DNS Primaire','ex: 1.1.1.1')}
+  ${inp('dhcpDomain','Nom de Domaine','ex: corp.local')}
+  ${inp('dhcpExclude','IPs à exclure de l\'assignation','ex: 192.168.10.1 192.168.10.10')}`;
+}
+function addDhcpPool() {
+  const c = document.getElementById('dhcpPools');
+  const d = document.createElement('div'); d.className='dyn-row';
+  d.innerHTML=`<input type="text" class="form-input" placeholder="Nom du Pool"><input type="text" class="form-input" placeholder="Réseau"><input type="text" class="form-input" placeholder="Masque"><button class="dyn-del" onclick="this.parentElement.remove()">✕</button>`;
+  c.appendChild(d);
+}
+
+function formACL() {
+  return `
+  ${sel('aclType','Type d\'ACL',[{v:'extended',l:'Étendue (IP src/dst + Port)'},{v:'standard',l:'Standard (IP src uniquement)'}])}
+  ${inp('aclName','Nom de l\'ACL','ex: BLOCK_UNAUTHORIZED')}
+  <div class="form-group">
+    <label class="form-label">Règles (ACE)</label>
+    <div id="aclRules">
+      <div class="dyn-row">
+        <select class="form-select" style="width:90px;flex:none"><option>permit</option><option>deny</option></select>
+        <input type="text" class="form-input" placeholder="Source (10.0.0.0 0.0.0.255)">
+        <input type="text" class="form-input" placeholder="Dest (any)">
+        <button class="dyn-del" onclick="this.parentElement.remove()">✕</button>
+      </div>
+    </div>
+    <button class="dyn-add" onclick="addAclRule()">+ Ajouter Règle</button>
+  </div>
+  ${inp('aclApply','Appliquer sur l\'interface','ex: GigabitEthernet1/0/1 in')}
+  ${chk('aclLog','Activer la journalisation (log) sur les correspondances',true)}`;
+}
+function addAclRule() {
+  const c = document.getElementById('aclRules');
+  const d = document.createElement('div'); d.className='dyn-row';
+  d.innerHTML=`<select class="form-select" style="width:90px;flex:none"><option>permit</option><option>deny</option></select><input type="text" class="form-input" placeholder="Source"><input type="text" class="form-input" placeholder="Destination"><button class="dyn-del" onclick="this.parentElement.remove()">✕</button>`;
+  c.appendChild(d);
+}
+
+function formPortSec() {
+  return `
+  ${inp('psIf','Interface(s) Cible(s)','ex: GigabitEthernet1/0/1-48')}
+  ${inp('psMax','Adresses MAC Max. autorisées','ex: 2')}
+  ${sel('psAction','Action si Violation',[{v:'shutdown',l:'Shutdown (Block & Err-Disable)'},{v:'restrict',l:'Restrict (Drop & Log)'},{v:'protect',l:'Protect (Drop Silencieux)'}])}
+  ${chk('psSticky','Activer MAC Sticky (Apprentissage auto)',true)}
+  ${chk('psRecovery','Activer Err-Disable Recovery',true)}
+  ${inp('psRecoveryTime','Délai de Recovery (secondes)','ex: 300')}`;
+}
+
+function formNTP() {
+  return `
+  <div class="form-group">
+    <label class="form-label">Serveurs NTP</label>
+    <div id="ntpServers">
+      <div class="dyn-row">
+        <input type="text" class="form-input" placeholder="IP / FQDN (ex: pool.ntp.org)">
+        <select class="form-select" style="width:100px;flex:none"><option>prefer</option><option>normal</option></select>
+        <button class="dyn-del" onclick="this.parentElement.remove()">✕</button>
+      </div>
+    </div>
+    <button class="dyn-add" onclick="addNtpServer()">+ Ajouter Serveur NTP</button>
+  </div>
+  ${inp('ntpTZ','Timezone','ex: CET 1 0')}
+  ${chk('ntpAuth','Activer Authentification NTP',false)}
+  ${inp('ntpKey','Clé NTP partagée','ex: NexorTimeKey')}`;
+}
+function addNtpServer() {
+  const c = document.getElementById('ntpServers');
+  const d = document.createElement('div'); d.className='dyn-row';
+  d.innerHTML=`<input type="text" class="form-input" placeholder="IP / FQDN"><select class="form-select" style="width:100px;flex:none"><option>prefer</option><option>normal</option></select><button class="dyn-del" onclick="this.parentElement.remove()">✕</button>`;
+  c.appendChild(d);
+}
+
+function formAAA() {
+  return `
+  <div class="form-group">
+    <label class="form-label">Serveurs RADIUS (ex: Cisco ISE)</label>
+    <div id="radiusServers">
+      <div class="dyn-row">
+        <input type="text" class="form-input" placeholder="IP Serveur (10.0.0.5)">
+        <input type="text" class="form-input" placeholder="Clé Secrète" style="width:150px;flex:none">
+        <button class="dyn-del" onclick="this.parentElement.remove()">✕</button>
+      </div>
+    </div>
+    <button class="dyn-add" onclick="addRadiusServer()">+ Ajouter RADIUS</button>
+  </div>
+  ${inp('aaaSrcIf','Interface Source RADIUS','ex: Vlan99')}
+  ${chk('aaaLocal','Activer le Fallback Local (Si RADIUS HS)',true)}
+  ${chk('aaaDot1x','Activer Dot1X globalement sur le switch',true)}
+  ${chk('aaaMab','Pré-configurer l\'authentification MAB',false)}`;
+}
+function addRadiusServer() {
+  const c = document.getElementById('radiusServers');
+  const d = document.createElement('div'); d.className='dyn-row';
+  d.innerHTML=`<input type="text" class="form-input" placeholder="IP Serveur"><input type="text" class="form-input" placeholder="Clé Secrète" style="width:150px;flex:none"><button class="dyn-del" onclick="this.parentElement.remove()">✕</button>`;
+  c.appendChild(d);
+}
+
+function formLACP() {
+  return `
+  ${inp('lagPC','ID du Port-Channel','ex: 10')}
+  ${inp('lagDesc','Description','ex: UPLINK_CORE_SW')}
+  ${inp('lagMembers','Interfaces Membres (Physiques)','ex: Te1/1/1, Te1/1/2')}
+  ${sel('lagMode','LACP Mode',[{v:'active',l:'Active (Recommandé)'},{v:'passive',l:'Passive'},{v:'on',l:'ON (Désactive LACP)'}])}
+  ${sel('lagType','Switchport Mode',[{v:'trunk',l:'Trunk'},{v:'access',l:'Access'}])}
+  ${inp('lagVlans','VLANs Autorisés (Si Trunk)','ex: 10,20,30')}`;
+}
+
+function formSTP() {
+  return `
+  ${sel('stpMode','Version Spanning-Tree',[{v:'rapid-pvst',l:'Rapid PVST+ (Par défaut Cisco)'},{v:'mst',l:'MST (Multiple Spanning Tree)'}])}
+  <div class="form-group">
+    <label class="form-label">Priorité du Pont (Bridge Priority)</label>
+    <div id="stpPriorities">
+      <div class="dyn-row">
+        <input type="text" class="form-input" placeholder="VLANs (ex: 10,20 ou 1-4094)">
+        <select class="form-select" style="width:140px;flex:none"><option>4096 (Primary Root)</option><option>8192 (Secondary Root)</option><option>32768 (Default)</option></select>
+        <button class="dyn-del" onclick="this.parentElement.remove()">✕</button>
+      </div>
+    </div>
+    <button class="dyn-add" onclick="addStpPrio()">+ Configurer Priorité</button>
+  </div>
+  ${chk('stpBpduGuard','Activer BPDU Guard par défaut (Access)',true)}
+  ${chk('stpLoopGuard','Activer Loop Guard par défaut',true)}`;
+}
+function addStpPrio() {
+  const c = document.getElementById('stpPriorities');
+  const d = document.createElement('div'); d.className='dyn-row';
+  d.innerHTML=`<input type="text" class="form-input" placeholder="VLANs"><select class="form-select" style="width:140px;flex:none"><option>4096 (Primary Root)</option><option>8192 (Secondary)</option><option>32768 (Default)</option></select><button class="dyn-del" onclick="this.parentElement.remove()">✕</button>`;
+  c.appendChild(d);
+}
+
+function formVPC() {
+  return `
+  ${inp('vpcDomain','vPC Domain ID','ex: 10')}
+  ${inp('vpcPeerKeepalive','IP Destination Peer-Keepalive','ex: 10.1.1.2')}
+  ${inp('vpcSrcIP','IP Source Peer-Keepalive','ex: 10.1.1.1')}
+  ${inp('vpcPeerLink','Port-Channel Peer-Link','ex: 100')}
+  ${chk('vpcGraceful','Activer Graceful Consistency Check',true)}
+  ${chk('vpcAuto','Activer Auto-Recovery',true)}`;
+}
+
+function formType7() {
+  return `
+  <div style="background:rgba(249, 115, 22, 0.05);border:1px solid rgba(249, 115, 22, 0.2);border-radius:8px;padding:16px;margin-bottom:16px;font-size:11px;color:var(--text-2);line-height:1.6">
+    <strong style="color:var(--primary)">⚠️ Avertissement Sécurité :</strong> Le type 7 Cisco est réversible. Ne l'utilisez pas pour les accès administrateurs (privilégiez 'enable secret').
+  </div>
+  ${inp('t7decode','Déchiffrer un mot de passe (Hash Type 7)','ex: 060506324F41')}
+  ${inp('t7encode','Chiffrer un mot de passe (Texte clair)','ex: MySecretPass')}
+  ${sel('t7context','Contexte d\'utilisation de la config CLI',[{v:'line',l:'VTY / Console'},{v:'tacacs',l:'TACACS/RADIUS Key'},{v:'ospf',l:'OSPF Auth'},{v:'bgp',l:'BGP Password'}])}`;
+}
+
+function formMtuMss() {
+  return `
+  ${inp('mtuBase','MTU Physique de base','ex: 1500', 'Standard=1500, Jumbo=9000', 'number')}
+  <div class="form-group">
+    <label class="form-label">Tunnels / Encapsulations actives</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;background:var(--dark);padding:12px;border:1px solid var(--border);border-radius:8px;">
+      ${chk('encGRE','GRE (+24 bytes)',false)}
+      ${chk('encIPsecESP','IPsec ESP (+73 bytes)',false)}
+      ${chk('encVxLAN','VXLAN (+50 bytes)',false)}
+      ${chk('encPPPoE','PPPoE (+8 bytes)',false)}
+    </div>
+  </div>
+  ${sel('mtuProto','Protocole Transport',[{v:'tcp',l:'TCP (Calcule MSS optimal)'},{v:'udp',l:'UDP'}])}`;
+}
+
+function formFirewall() {
+  return `
+  ${sel('fwEngine','Moteur Pare-feu',[{v:'iptables',l:'Linux iptables'},{v:'nftables',l:'Linux nftables'},{v:'ufw',l:'Ubuntu UFW'}])}
+  ${sel('fwAction','Action de la règle',[{v:'ACCEPT',l:'Autoriser (ACCEPT)'},{v:'DROP',l:'Bloquer (DROP)'},{v:'LOG',l:'Journaliser (LOG)'}])}
+  ${sel('fwProto','Protocole',[{v:'tcp',l:'TCP'},{v:'udp',l:'UDP'},{v:'icmp',l:'ICMP'},{v:'all',l:'All'}])}
+  ${inp('fwSrcIP','IP/CIDR Source','ex: 192.168.1.0/24')}
+  ${inp('fwDstPort','Port(s) Destination','ex: 443, 80')}
+  ${chk('fwStateful','Autoriser les connexions établies (Stateful/Conntrack)',true)}`;
+}
+
+// ── CONFIG GENERATORS ────────────────────────────────────────────────────────
+function v(id) { return (document.getElementById(id)||{}).value||''; }
+function c(id) { return (document.getElementById(id)||{}).checked||false; }
+
+const TS = () => new Date().toLocaleString('fr-FR');
+function header(type, vendor) {
+  const v = VENDORS[AppState.vendor];
+  return `! ════════════════════════════════════════════════════
+! NetForge AI — Enterprise Config Generator
+! Architecture : ${v ? v.name : AppState.vendor} | Template : ${type}
+! Date       : ${TS()}
+! NEXOR Advisory — CCIE / Network Consulting
+! ════════════════════════════════════════════════════
+!`;
+}
+
+function generateConfig() {
+  const gens = {
+    'vlan': genVLAN, 'interface-access': genIfAccess, 'interface-trunk': genIfTrunk,
+    'interface-l3': genIfL3, 'ospf': genOSPF, 'bgp': genBGP, 'dhcp': genDHCP,
+    'acl': genACL, 'port-security': genPortSec, 'ntp': genNTP, 'aaa': genAAA,
+    'lacp': genLACP, 'stp': genSTP, 'vpc': genVPC, 'type7': genType7,
+    'mtu-mss': genMtuMss, 'firewall': genFirewall,
+  };
+  const fn = gens[AppState.configType];
+  if (!fn) return showToast('Module non disponible.', 'error');
+
+  let cfg;
+  try { cfg = fn(); } catch(e) { return showToast('Erreur: ' + e.message, 'error'); }
+  if (!cfg) return;
+
+  AppState.lastConfig = cfg;
+  renderConfig(cfg);
+  saveToHistory(cfg, AppState.vendor, AppState.configType);
+  document.getElementById('aiOutput').style.display = 'none';
+  updateHeroStats();
+  switchOutTab('config');
+  showToast('✅ Configuration CLI générée avec succès.', 'success');
+}
+
+function genVLAN() {
+  const rows = document.querySelectorAll('#vlanRows .dyn-row');
+  if (!rows.length) { showToast('Ajoutez au moins un VLAN', 'error'); return null; }
+
+  const vlans = [];
+  rows.forEach(r => {
+    const ins = r.querySelectorAll('input');
+    const id = ins[0].value, name = ins[1].value;
+    const type = r.querySelector('select').value;
+    if (id && name) vlans.push({id: parseInt(id), name, type});
+  });
+  if (!vlans.length) { showToast('ID et Nom requis', 'error'); return null; }
+
+  let cfg = header('Plan VLAN & Layer 2', AppState.vendor) + '\n';
+  
+  if (c('vlanVTP')) {
+    cfg += `vtp mode transparent\n`;
+    if (v('vtpDomain')) cfg += `vtp domain ${v('vtpDomain')}\n`;
+    cfg += `!\n`;
+  }
+
+  vlans.forEach(vl => { cfg += `vlan ${vl.id}\n name ${vl.name}\n!\n`; });
+
+  if (c('vlanMgmt')) cfg += `! Security Best Practice (RFC 3704)\ninterface Vlan1\n shutdown\n!\n`;
+
+  cfg += `! ── DHCP Snooping & ARP Inspection ──\nip dhcp snooping\n`;
+  vlans.forEach(vl => { cfg += `ip dhcp snooping vlan ${vl.id}\n`; });
+  cfg += `no ip dhcp snooping information option\n!\n`;
+
+  vlans.forEach(vl => { if (vl.type !== 'INFRA') cfg += `ip arp inspection vlan ${vl.id}\n`; });
+  
+  return cfg + `!\n`;
+}
+
+function genIfAccess() {
+  const ifN = v('ifName'); if(!ifN) { showToast('Interface requise', 'error'); return null; }
+  let cfg = header('Access Port (User/Endpoint)', AppState.vendor) + '\n';
+  cfg += `interface ${ifN}\n`;
+  if (v('ifDesc')) cfg += ` description ${v('ifDesc')}\n`;
+  cfg += ` switchport mode access\n`;
+  if (v('ifVlan')) cfg += ` switchport access vlan ${v('ifVlan')}\n`;
+  if (v('ifVoice')) cfg += ` switchport voice vlan ${v('ifVoice')}\n`;
+  cfg += ` switchport nonegotiate\n`;
+  if (c('ifPortfast')) cfg += ` spanning-tree portfast\n`;
+  if (c('ifBpduGuard')) cfg += ` spanning-tree bpduguard enable\n`;
+  if (c('ifStorm')) cfg += ` storm-control broadcast level 80.00\n storm-control action shutdown\n`;
+  cfg += ` no cdp enable\n no lldp transmit\n`;
+  if (c('ifShut')) cfg += ` shutdown\n`;
+  if (c('ifNoShut')) cfg += ` no shutdown\n`;
+  return cfg + `!\n`;
+}
+
+function genIfTrunk() {
+  const ifN = v('trName'); if(!ifN) return null;
+  let cfg = header('Trunk Port (Uplink)', AppState.vendor) + '\n';
+  cfg += `interface ${ifN}\n`;
+  if (v('trDesc')) cfg += ` description ${v('trDesc')}\n`;
+  if (AppState.vendor !== 'cisco-nxos' && v('trEncap') === 'dot1q') cfg += ` switchport trunk encapsulation dot1q\n`;
+  cfg += ` switchport mode trunk\n`;
+  if (v('trVlans')) cfg += ` switchport trunk allowed vlan ${v('trVlans')}\n`;
+  if (v('trNative')) cfg += ` switchport trunk native vlan ${v('trNative')}\n`;
+  if (c('trDtp')) cfg += ` switchport nonegotiate\n`;
+  if (c('trRootGuard')) cfg += ` spanning-tree guard root\n`;
+  if (c('trNoShut')) cfg += ` no shutdown\n`;
+  return cfg + `!\n`;
+}
+
+function genIfL3() {
+  const ifN = v('l3Name'); if(!ifN) return null;
+  let ipAddr = v('l3IP'), mask = '';
+  if (ipAddr.includes('/')) {
+    const [a, p] = ipAddr.split('/');
+    ipAddr = a; mask = prefixToMask(parseInt(p));
+  } else if (ipAddr.includes(' ')) {
+    [ipAddr, mask] = ipAddr.split(' ');
+  }
+  let cfg = header('Routed Port (L3)', AppState.vendor) + '\n';
+  cfg += `interface ${ifN}\n no switchport\n`;
+  if (v('l3Desc')) cfg += ` description ${v('l3Desc')}\n`;
+  if (ipAddr) cfg += ` ip address ${ipAddr} ${mask}\n`;
+  if (v('l3Helper')) cfg += ` ip helper-address ${v('l3Helper')}\n`;
+  if (v('l3Ospf') && !c('l3Passive')) cfg += ` ip ospf ${v('ospfPid')||1} area ${v('l3Ospf')}\n`;
+  if (c('l3NoShut')) cfg += ` no shutdown\n`;
+  return cfg + `!\n`;
+}
+
+function genOSPF() {
+  const pid = v('ospfPid')||'1';
+  let cfg = header('OSPFv2 Routing', AppState.vendor) + '\n';
+  cfg += `router ospf ${pid}\n`;
+  if (v('ospfRid')) cfg += ` router-id ${v('ospfRid')}\n`;
+  cfg += ` passive-interface default\n`;
+  cfg += ` auto-cost reference-bandwidth ${v('ospfRef') || 100000}\n`;
+  if (c('ospfDefault')) cfg += ` default-information originate\n`;
+  document.querySelectorAll('#ospfNets .dyn-row').forEach(r => {
+    const ins = r.querySelectorAll('input');
+    if (ins[0].value) cfg += ` network ${ins[0].value} ${ins[1].value||'0.0.0.255'} area ${ins[2].value||'0'}\n`;
+  });
+  const pass = v('ospfPassive');
+  if (pass) pass.split(',').forEach(i => { if(i.trim()) cfg += ` no passive-interface ${i.trim()}\n`; });
+  cfg += `!\n`;
+  return cfg;
+}
+
+function genBGP() {
+  const as = v('bgpAS'); if(!as) return null;
+  let cfg = header('BGP Routing', AppState.vendor) + '\n';
+  cfg += `router bgp ${as}\n`;
+  if (v('bgpRID')) cfg += ` bgp router-id ${v('bgpRID')}\n`;
+  cfg += ` bgp log-neighbor-changes\n`;
+  if (v('bgpNets')) v('bgpNets').split(',').forEach(n => {
+    let t=n.trim(); if(t) {
+      if(t.includes('/')) { const [a,p]=t.split('/'); cfg+=` network ${a} mask ${prefixToMask(parseInt(p))}\n`; }
+      else cfg+=` network ${t}\n`;
+    }
+  });
+  document.querySelectorAll('#bgpNeighbors .dyn-row').forEach(r => {
+    const ins = r.querySelectorAll('input');
+    const ip = ins[0].value;
+    if (ip) {
+      cfg += ` neighbor ${ip} remote-as ${ins[1].value||as}\n`;
+      if (ins[2].value) cfg += ` neighbor ${ip} description ${ins[2].value}\n`;
+      if (c('bgpBFD')) cfg += ` neighbor ${ip} fall-over bfd\n`;
+    }
+  });
+  return cfg + `!\n`;
+}
+
+function genDHCP() {
+  let cfg = header('DHCP Server', AppState.vendor) + '\n';
+  if (v('dhcpExclude')) cfg += `ip dhcp excluded-address ${v('dhcpExclude')}\n!\n`;
+  document.querySelectorAll('#dhcpPools .dyn-row').forEach(r => {
+    const ins = r.querySelectorAll('input');
+    if (ins[0].value && ins[1].value) {
+      cfg += `ip dhcp pool ${ins[0].value}\n`;
+      let m = ins[2].value; if(m && m.includes('/')) m = prefixToMask(parseInt(m.replace('/','')));
+      cfg += ` network ${ins[1].value} ${m || '255.255.255.0'}\n`;
+      if (v('dhcpGW')) cfg += ` default-router ${v('dhcpGW')}\n`;
+      if (v('dhcpDNS1')) cfg += ` dns-server ${v('dhcpDNS1')}\n`;
+      if (v('dhcpDomain')) cfg += ` domain-name ${v('dhcpDomain')}\n`;
+      cfg += `!\n`;
+    }
+  });
+  return cfg;
+}
+
+function genACL() {
+  const type = v('aclType'), name = v('aclName');
+  if(!name) return null;
+  let cfg = header('Access Control List', AppState.vendor) + '\n';
+  cfg += `ip access-list ${type.includes('ext')?'extended':'standard'} ${name}\n`;
+  let seq = 10;
+  document.querySelectorAll('#aclRules .dyn-row').forEach(r => {
+    const act = r.querySelector('select').value, ins = r.querySelectorAll('input');
+    if (ins[0].value) {
+      cfg += ` ${seq} ${act} ${ins[0].value} ${ins[1]?.value||''}\n`;
+      seq += 10;
+    }
+  });
+  cfg += `!\n`;
+  if (v('aclApply')) {
+    const p = v('aclApply').split(' '), d = p.pop();
+    cfg += `interface ${p.join(' ')}\n ip access-group ${name} ${d}\n!\n`;
+  }
+  return cfg;
+}
+
+function genPortSec() {
+  const ifs = v('psIf'); if(!ifs) return null;
+  let cfg = header('Port Security', AppState.vendor) + '\n';
+  ifs.split(',').forEach(i => {
+    if(i.trim()) {
+      cfg += `interface ${i.trim()}\n switchport port-security\n switchport port-security maximum ${v('psMax')||2}\n`;
+      cfg += ` switchport port-security violation ${v('psAction')||'shutdown'}\n`;
+      if (c('psSticky')) cfg += ` switchport port-security mac-address sticky\n`;
+      cfg += `!\n`;
+    }
+  });
+  if (c('psRecovery')) cfg += `errdisable recovery cause psecure-violation\nerrdisable recovery interval ${v('psRecoveryTime')||300}\n!\n`;
+  return cfg;
+}
+
+function genNTP() {
+  let cfg = header('NTP Configuration', AppState.vendor) + '\n';
+  if (v('ntpTZ')) cfg += `clock timezone ${v('ntpTZ')}\n!\n`;
+  document.querySelectorAll('#ntpServers .dyn-row').forEach(r => {
+    const ins = r.querySelectorAll('input'), sel = r.querySelectorAll('select');
+    if (ins[0].value) cfg += `ntp server ${ins[0].value}${sel[0].value==='prefer'?' prefer':''}\n`;
+  });
+  return cfg + `!\n`;
+}
+
+function genAAA() {
+  let cfg = header('AAA & RADIUS (802.1X/MAB)', AppState.vendor) + '\n';
+  cfg += `aaa new-model\naaa group server radius ISE-SERVERS\n`;
+  let idx = 1;
+  document.querySelectorAll('#radiusServers .dyn-row').forEach(r => {
+    const ins = r.querySelectorAll('input');
+    if (ins[0].value) {
+      cfg += ` server-private ${ins[0].value} auth-port 1812 acct-port 1813\n`;
+      idx++;
+    }
+  });
+  cfg += `!\n`;
+  if (c('aaaDot1x')) cfg += `dot1x system-auth-control\n!\n`;
+  return cfg;
+}
+
+function genLACP() {
+  const pc = v('lagPC')||'1';
+  let cfg = header('LACP Port-Channel', AppState.vendor) + '\n';
+  cfg += `interface Port-channel${pc}\n`;
+  if (v('lagDesc')) cfg += ` description ${v('lagDesc')}\n`;
+  cfg += ` switchport mode ${v('lagType')||'trunk'}\n no shutdown\n!\n`;
+  v('lagMembers').split(',').forEach(i => {
+    if(i.trim()) {
+      cfg += `interface ${i.trim()}\n channel-group ${pc} mode ${v('lagMode')||'active'}\n no shutdown\n!\n`;
+    }
+  });
+  return cfg;
+}
+
+function genSTP() {
+  let cfg = header('Spanning-Tree Protocol', AppState.vendor) + '\n';
+  cfg += `spanning-tree mode ${v('stpMode')||'rapid-pvst'}\n!\n`;
+  document.querySelectorAll('#stpPriorities .dyn-row').forEach(r => {
+    const ins = r.querySelectorAll('input'), sel = r.querySelectorAll('select');
+    if (ins[0].value) cfg += `spanning-tree vlan ${ins[0].value} priority ${sel[0].value.split(' ')[0]}\n`;
+  });
+  if (c('stpBpduGuard')) cfg += `spanning-tree portfast bpduguard default\n`;
+  return cfg + `!\n`;
+}
+
+function genVPC() {
+  let cfg = header('Nexus vPC Domain', AppState.vendor) + '\n';
+  cfg += `feature vpc\nfeature lacp\n!\n`;
+  cfg += `vpc domain ${v('vpcDomain')||10}\n`;
+  if(v('vpcPeerKeepalive') && v('vpcSrcIP')) cfg += ` peer-keepalive destination ${v('vpcPeerKeepalive')} source ${v('vpcSrcIP')}\n`;
+  cfg += `!\ninterface ${v('vpcPeerLink')||'port-channel100'}\n vpc peer-link\n!\n`;
+  return cfg;
+}
+
+function genType7() {
+  return header('Cisco Type 7 Crypto', AppState.vendor) + '\n! Utilisez l\'outil en local pour voir l\'output\n!\n';
+}
+
+function genMtuMss() {
+  const mtu = parseInt(v('mtuBase'))||1500;
+  let over = 0;
+  if(c('encGRE')) over += 24; if(c('encIPsecESP')) over += 73;
+  if(c('encVxLAN')) over += 50; if(c('encPPPoE')) over += 8;
+  const eff = mtu - over;
+  const mss = v('mtuProto') === 'tcp' ? eff - 40 : eff - 28;
+  return header('MTU & MSS Adjustment', AppState.vendor) + `\n! MTU Effectif : ${eff}\n! MSS Optimal : ${mss}\n!\ninterface GigabitEthernet0/1\n ip mtu ${eff}\n ip tcp adjust-mss ${mss}\n!\n`;
+}
+
+function genFirewall() {
+  const engine = v('fwEngine')||'iptables';
+  return header(`Firewall ${engine.toUpperCase()}`, AppState.vendor) + `\n# Exécutez cette commande Linux :\n${engine} -A ${v('fwAction')} ...\n`;
+}
+
+// ── SYNTAX HIGHLIGHTING & RENDER ─────────────────────────────────────────────
+function highlight(code) {
+  let h = code;
+  h = h.replace(/^(!.*)$/gm, '<span class="sh-comment">$1</span>');
+  h = h.replace(/\b(interface|router|vlan|network|neighbor|area|ip|no|shutdown|description|switchport|spanning-tree|ntp|aaa|radius|dot1x|mab|errdisable|port-channel|channel-group|bgp|ospf|dhcp|access-list|clock|feature|vpc|set)\b/gi, '<span class="sh-keyword">$1</span>');
+  h = h.replace(/\b(mode|address|server|default|permitted|passive|auto|active|trunk|access|negotiate|portfast|bpduguard|loopguard|authentication|authorization|accounting)\b/gi, '<span class="sh-keyword2">$1</span>');
+  h = h.replace(/\b(GigabitEthernet|TenGigabitEthernet|HundredGigabitEthernet|FastEthernet|Loopback|Port-channel|Vlan|ge-\d|et-\d|xe-\d|ae\d)[\d\/\.\-]*/gi, '<span class="sh-iface">$&</span>');
+  h = h.replace(/\b(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\b/g, '<span class="sh-ip">$1</span>');
+  h = h.replace(/\bvlan (\d+)/gi, 'vlan <span class="sh-vlan">$1</span>');
+  return h;
+}
+
+function renderConfig(code) {
+  const out = document.getElementById('configOutput');
+  const lines = code.split('\n');
+  AppState.lastConfig = code;
+
+  if (AppState.lineNumbers) {
+    const lns = lines.map((l, i) =>
+      `<span style="user-select:none;color:#4B5563;display:inline-block;width:40px;text-align:right;padding-right:12px">${i+1}</span>${highlight(escapeHTML(l))}`
+    ).join('\n');
+    out.innerHTML = lns;
+  } else {
+    out.innerHTML = lines.map(l => highlight(escapeHTML(l))).join('\n');
+  }
+
+  document.getElementById('out-vendor-badge').textContent = VENDORS[AppState.vendor]?.name || AppState.vendor;
+  document.getElementById('out-type-badge').textContent = CONFIG_TYPES[AppState.configType]?.name || AppState.configType;
+  const activeLines = lines.filter(l => l.trim()).length;
+  document.getElementById('out-lines-info').textContent = `${activeLines} lignes · ${code.length.toLocaleString()} chars`;
+}
+
+function toggleLineNumbers() {
+  AppState.lineNumbers = !AppState.lineNumbers;
+  if (AppState.lastConfig) renderConfig(AppState.lastConfig);
+}
+
+// ── AI REVIEW (Proxy Endpoint Netlify) ────────────────────────────────────────
+async function aiReview() {
+  if (!AppState.lastConfig) { showToast('Générez une config d\'abord', 'error'); return; }
+  
+  const mode = document.getElementById('aiMode').value;
+  const btn = document.getElementById('aiBtn');
+  const spinner = document.getElementById('aiSpinner');
+  const aiPanel = document.getElementById('aiOutput');
+  const aiText = document.getElementById('aiText');
+
+  const vendor = VENDORS[AppState.vendor];
+  const sysPrompt = `Tu es un expert réseau certifié CCIE (${vendor?.name}). Réponds en français de façon pro et concise.`;
+  const userPrompt = `Analyse cette configuration selon le mode [${mode}] :\n\`\`\`\n${AppState.lastConfig}\n\`\`\``;
+
+  btn.disabled = true;
+  spinner.innerHTML = '<span class="spin"></span>';
+  aiText.textContent = '⏳ Analyse en cours via l\'IA...';
+  aiPanel.style.display = 'block';
+
+  if (AppState.provider === 'none') {
+    aiText.textContent = '⚡ Mode Sans IA activé. Activez Claude ou LM Studio pour la revue.';
+    btn.disabled = false; spinner.innerHTML = '';
+    return;
+  }
+
+  try {
+    let responseText = "";
+    if (AppState.provider === 'lm') {
+      const lmBase = (document.getElementById('lmUrlM03')?.value || 'http://localhost:1234').replace(/\/+$/, '');
+      const res = await fetch(lmBase + '/v1/chat/completions', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ messages: [{ role:'system', content:sysPrompt }, { role:'user', content:userPrompt }] })
+      });
+      const data = await res.json();
+      responseText = data.choices[0].message.content;
+    } else {
+      const res = await fetch('/api/analyze', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ model: 'claude-sonnet-4-6', system: sysPrompt, messages: [{ role:'user', content:userPrompt }] })
+      });
+      if(!res.ok) throw new Error("Erreur Proxy API");
+      const data = await res.json();
+      responseText = data.content?.[0]?.text || data.reply || "Réponse vide";
+    }
+    aiText.textContent = responseText;
+    showToast('✅ Revue IA terminée', 'success');
+  } catch(e) {
+    aiText.textContent = `❌ Erreur : ${e.message}`;
+    showToast('Erreur IA', 'error');
+  } finally {
+    btn.disabled = false; spinner.innerHTML = '';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => { if(typeof initApp==='function') initApp(); });
+
+function testLMStudioM03() {
+  const url = (document.getElementById('lmUrlM03').value || 'http://localhost:1234').trim().replace(/\/+$/, '');
+  const st = document.getElementById('lmStatusM03');
+  st.textContent = 'Test en cours...'; st.style.color = '#fbbf24';
+  fetch(url + '/v1/models', {method:'GET'})
+    .then(r => r.json())
+    .then(d => {
+      st.textContent = '✅ Connecté avec succès !'; st.style.color = '#10b981';
+      if(d.data && d.data.length && !document.getElementById('lmModelM03').value) {
+        document.getElementById('lmModelM03').value = d.data[0].id;
+      }
+    })
+    .catch(e => {
+      st.textContent = '❌ Injoignable. Vérifiez le port (ex: 1234).';
+      st.style.color = '#ef4444';
+    });
+}
+</script>
+<script>window.NX_TOOL_ID = 'module03';</script>
+<script src="../js/netforge-assistant.js" defer></script>
+</body>
+</html>
